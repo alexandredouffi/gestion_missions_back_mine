@@ -1,10 +1,9 @@
 from django.contrib import admin
 from .models import (
     User, Entite, Profil, CategorieEmploye, Destination, Bareme, Direction,
-    Mission, Workflow, UserWorkflow, MissionWorkflow
+    Mission, Workflow, MissionWorkflow
 )
 
-# Admin simples
 admin.site.register(User)
 admin.site.register(Entite)
 admin.site.register(Profil)
@@ -13,26 +12,21 @@ admin.site.register(Destination)
 admin.site.register(Bareme)
 admin.site.register(Direction)
 
-# Admin personnalisés
 
 @admin.register(Mission)
 class MissionAdmin(admin.ModelAdmin):
-    readonly_fields = ('numero_mission',)  # numéro généré automatiquement
+    readonly_fields = ('numero_mission',)
     list_display = ('numero_mission', 'objet_mission', 'entite', 'statut_mission', 'date_demande')
     list_filter = ('statut_mission', 'entite')
     search_fields = ('numero_mission', 'objet_mission')
 
+
 @admin.register(Workflow)
 class WorkflowAdmin(admin.ModelAdmin):
-    list_display = ('filiale', 'numero_etape', 'libelle_etape')
+    list_display = ('filiale', 'numero_etape', 'libelle_etape', 'user')
     list_filter = ('filiale',)
-    search_fields = ('libelle_etape',)
+    search_fields = ('libelle_etape', 'user__username')
 
-@admin.register(UserWorkflow)
-class UserWorkflowAdmin(admin.ModelAdmin):
-    list_display = ('user', 'workflow')
-    list_filter = ('workflow', 'user')
-    search_fields = ('user__username', 'workflow__libelle_etape')
 
 @admin.register(MissionWorkflow)
 class MissionWorkflowAdmin(admin.ModelAdmin):

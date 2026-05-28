@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import date
+from django.utils import timezone
+from datetime import date, timedelta
+import uuid
+import random
 
 
 class User(AbstractUser):
@@ -13,6 +16,7 @@ class User(AbstractUser):
     profil = models.ForeignKey('Profil', on_delete=models.CASCADE, null=True, blank=True)
     category = models.ForeignKey('CategorieEmploye', on_delete=models.CASCADE, null=True, blank=True)
     direction = models.ForeignKey('Direction', on_delete=models.CASCADE, null=True, blank=True)
+    filiales_attribuees = models.ManyToManyField('Entite', blank=True, related_name='utilisateurs_attribues')
 
     class Meta:
         verbose_name = "Utilisateur"
@@ -96,7 +100,7 @@ class Bareme(models.Model):
     class Meta:
         verbose_name = "Indemnité de mission"
         verbose_name_plural = "Indemnités de mission"
-        unique_together = ('categorie', 'destination')
+        unique_together = ('filiale', 'categorie', 'destination')
         ordering = ['categorie', 'destination']
 
     def __str__(self):
@@ -105,6 +109,7 @@ class Bareme(models.Model):
 
 class Mission(models.Model):
     STATUTS_MISSION = [
+        ('EN_ATTENTE', 'En attente'),
         ('EN_COURS', 'En cours'),
         ('APPROUVEE', 'Approuvée'),
         ('REJETEE', 'Rejetée'),
@@ -112,22 +117,18 @@ class Mission(models.Model):
     ]
 
     date_demande = models.DateField()
-    entite = models.ForeignKey('Entite', on_delete=models.CASCADE, null=False, blank=False, default=1)
+    entite = models.ForeignKey('Entite', on_delete=models.CASCADE)
     objet_mission = models.CharField(max_length=255)
     date_depart = models.DateField()
     date_retour = models.DateField()
     lieu_mission = models.CharField(max_length=255)
-    statut_mission = models.CharField(
-        max_length=20,
-        choices=STATUTS_MISSION,
-        default='EN_ATTENTE'
-    )
-    numero_mission = models.CharField(max_length=100, unique=True)
-    destination_mission = models.ForeignKey('Destination', on_delete=models.CASCADE, null=False, blank=False, default=1)
+    statut_mission = models.CharField(max_length=20, choices=STATUTS_MISSION, default='EN_ATTENTE')
+    numero_mission = models.CharField(max_length=100, unique=True, blank=True)
+    destination_mission = models.ForeignKey('Destination', on_delete=models.CASCADE)
     contexte_mission = models.TextField(blank=True, null=True)
     objectifs_mission = models.TextField(blank=True, null=True)
     frais_extra = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    demandeur = models.ForeignKey('User', on_delete=models.CASCADE, null=True, blank=True)
+    demandeur = models.ForeignKey('User', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'missions'
@@ -136,13 +137,28 @@ class Mission(models.Model):
         ordering = ['-date_demande']
 
     def save(self, *args, **kwargs):
-        if not self.numero_mission:
-            last_mission = Mission.objects.order_by('-id').first()
-            num_ordre = (last_mission.id + 1) if last_mission else 1
+        if not self.pk:
+            self.numero_mission = str(uuid.uuid4())
+            super().save(*args, **kwargs)
             annee = self.date_demande.year if self.date_demande else date.today().year
-            abrev = self.entite.abreviation
-            self.numero_mission = f"{num_ordre}/DRH/{abrev}/{annee}"
-        super().save(*args, **kwargs)
+            self.numero_mission = f"{self.id}/DRH/{self.entite.abreviation}/{annee}"
+            super().save(update_fields=['numero_mission'])
+            self._creer_etapes_workflow()
+        else:
+            super().save(*args, **kwargs)
+
+    def _creer_etapes_workflow(self):
+        etapes = Workflow.objects.filter(filiale=self.entite).order_by('numero_etape')
+        MissionWorkflow.objects.bulk_create([
+            MissionWorkflow(
+                mission=self,
+                workflow=etape,
+                numero_etape=etape.numero_etape,
+                libelle_etape=etape.libelle_etape,
+                user_validation=etape.user,
+            )
+            for etape in etapes
+        ])
 
     def __str__(self):
         return f"{self.numero_mission} - {self.objet_mission}"
@@ -152,6 +168,7 @@ class Workflow(models.Model):
     filiale = models.ForeignKey('Entite', on_delete=models.CASCADE)
     numero_etape = models.PositiveIntegerField()
     libelle_etape = models.CharField(max_length=255)
+    user = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='etapes_workflow')
 
     class Meta:
         db_table = 'workflows'
@@ -164,22 +181,204 @@ class Workflow(models.Model):
         return f"{self.filiale.abreviation} - Étape {self.numero_etape}: {self.libelle_etape}"
 
 
-class UserWorkflow(models.Model):
-    workflow = models.ForeignKey('Workflow', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='workflows')
+class Delegation(models.Model):
+    mission = models.ForeignKey('Mission', on_delete=models.CASCADE, related_name='delegations')
+    employe = models.ForeignKey('User', on_delete=models.CASCADE, related_name='delegations')
+    est_chef = models.BooleanField(default=False)
+    bareme = models.ForeignKey('Bareme', on_delete=models.SET_NULL, null=True, blank=True)
+    duree = models.PositiveIntegerField(default=0)
+    est_longue_duree = models.BooleanField(default=False)
+    montant_hebergement = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    montant_perdiem = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    montant_communication = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    montant_transport = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    montant_total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
     class Meta:
-        db_table = 'user_workflows'
-        verbose_name = 'Utilisateur Workflow'
-        verbose_name_plural = 'Utilisateurs Workflow'
-        unique_together = ('workflow', 'user')
+        verbose_name = "Membre de délégation"
+        verbose_name_plural = "Membres de délégation"
+        unique_together = ('mission', 'employe')
+
+    def save(self, *args, **kwargs):
+        if self.est_chef:
+            Delegation.objects.filter(mission=self.mission, est_chef=True).exclude(pk=self.pk).update(est_chef=False)
+
+        if not self.bareme_id and self.employe.filiale and self.employe.category:
+            try:
+                self.bareme = Bareme.objects.get(
+                    filiale=self.employe.filiale,
+                    categorie=self.employe.category,
+                    destination=self.mission.destination_mission
+                )
+            except Bareme.DoesNotExist:
+                pass
+
+        self._calculer_montants()
+        super().save(*args, **kwargs)
+
+    def _calculer_montants(self):
+        duree = (self.mission.date_retour - self.mission.date_depart).days + 1
+        self.duree = duree
+        self.est_longue_duree = duree > 15
+
+        if not self.bareme:
+            return
+
+        if self.est_longue_duree:
+            self.montant_hebergement = 0
+            self.montant_perdiem = 0
+            self.montant_communication = 0
+            self.montant_transport = 0
+            self.montant_total = self.bareme.forfait * duree
+        else:
+            self.montant_hebergement = self.bareme.hebergement * (duree - 1)
+            self.montant_perdiem = self.bareme.perdiem * duree
+            self.montant_communication = self.bareme.communication
+            self.montant_transport = self.bareme.transport
+            self.montant_total = (
+                self.montant_hebergement + self.montant_perdiem +
+                self.montant_communication + self.montant_transport
+            )
 
     def __str__(self):
-        return f"{self.user.username} → {self.workflow.libelle_etape}"
+        chef = " (Chef)" if self.est_chef else ""
+        return f"{self.employe.username}{chef} → {self.mission.numero_mission}"
+
+
+class Paiement(models.Model):
+    MODE_CHOICES = [
+        ('CHEQUE', 'Chèque'),
+        ('LIQUIDE', 'Liquide'),
+    ]
+
+    delegation = models.OneToOneField('Delegation', on_delete=models.CASCADE, related_name='paiement')
+    mode = models.CharField(max_length=10, choices=MODE_CHOICES)
+    montant = models.DecimalField(max_digits=12, decimal_places=2)
+    reference_cheque = models.CharField(max_length=100, null=True, blank=True)
+    cheque_document = models.FileField(upload_to='cheques/%Y/%m/', null=True, blank=True)
+    date_paiement = models.DateField()
+    effectue = models.BooleanField(default=False)
+    enregistre_par = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='paiements_enregistres')
+
+    class Meta:
+        verbose_name = "Paiement"
+        verbose_name_plural = "Paiements"
+
+    def save(self, *args, **kwargs):
+        if self.delegation.mission.statut_mission != 'APPROUVEE':
+            raise ValueError("Le paiement ne peut être enregistré que pour une mission approuvée.")
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.delegation.employe.username} — {self.mode} — {self.montant}"
+
+
+class JustificationHebergement(models.Model):
+    delegation = models.OneToOneField('Delegation', on_delete=models.CASCADE, related_name='justification_hebergement')
+    date_soumission = models.DateTimeField(auto_now_add=True)
+    valide_par_comptable = models.ForeignKey(
+        'User', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='justifications_validees'
+    )
+    date_validation_comptable = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Justification hébergement"
+        verbose_name_plural = "Justifications hébergement"
+
+    @property
+    def montant_total_justifie(self):
+        return self.pieces.aggregate(
+            total=models.Sum('montant')
+        )['total'] or 0
+
+    @property
+    def est_complet(self):
+        return self.montant_total_justifie >= self.delegation.montant_hebergement
+
+    def __str__(self):
+        return f"Justification — {self.delegation.employe.username} — {self.delegation.mission.numero_mission}"
+
+
+class PieceJustificative(models.Model):
+    justification = models.ForeignKey('JustificationHebergement', on_delete=models.CASCADE, related_name='pieces')
+    libelle = models.CharField(max_length=255)
+    montant = models.DecimalField(max_digits=12, decimal_places=2)
+    document = models.FileField(upload_to='justifications/%Y/%m/')
+    date_ajout = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Pièce justificative"
+        verbose_name_plural = "Pièces justificatives"
+        ordering = ['date_ajout']
+
+    def __str__(self):
+        return f"{self.libelle} — {self.montant} F"
+
+
+class OTPCode(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='otp_codes')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "Code OTP"
+        verbose_name_plural = "Codes OTP"
+        ordering = ['-created_at']
+
+    @classmethod
+    def generer(cls, user):
+        cls.objects.filter(user=user, is_used=False).delete()
+        code = f"{random.randint(0, 999999):06d}"
+        return cls.objects.create(
+            user=user,
+            code=code,
+            expires_at=timezone.now() + timedelta(minutes=5),
+        )
+
+    @property
+    def est_valide(self):
+        return not self.is_used and timezone.now() <= self.expires_at
+
+    def __str__(self):
+        return f"OTP {self.user.username} — {'valide' if self.est_valide else 'expiré'}"
+
+
+class NotificationLog(models.Model):
+    STATUTS = [
+        ('ENVOYE', 'Envoyé'),
+        ('ECHEC', 'Échec'),
+        ('IGNORE', 'Ignoré — pas de destinataire valide'),
+    ]
+
+    sujet = models.CharField(max_length=255)
+    destinataires = models.TextField(blank=True)
+    statut = models.CharField(max_length=10, choices=STATUTS)
+    erreur = models.TextField(blank=True, null=True)
+    date_envoi = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Log notification email"
+        verbose_name_plural = "Logs notifications email"
+        ordering = ['-date_envoi']
+
+    def __str__(self):
+        return f"[{self.statut}] {self.sujet} — {self.date_envoi:%d/%m/%Y %H:%M}"
 
 
 class MissionWorkflow(models.Model):
+    STATUTS = [
+        ('EN_ATTENTE', 'En attente'),
+        ('APPROUVE', 'Approuvé'),
+        ('REJETE', 'Rejeté'),
+    ]
+
     mission = models.ForeignKey('Mission', on_delete=models.CASCADE, related_name='etapes_workflow')
-    workflow = models.ForeignKey('Workflow', on_delete=models.CASCADE, related_name='etapes_mission')
+    workflow = models.ForeignKey('Workflow', on_delete=models.SET_NULL, null=True, blank=True, related_name='etapes_mission')
+    numero_etape = models.PositiveIntegerField(default=0)
+    libelle_etape = models.CharField(max_length=255, blank=True, default='')
     user_validation = models.ForeignKey(
         'User',
         on_delete=models.SET_NULL,
@@ -187,18 +386,15 @@ class MissionWorkflow(models.Model):
         blank=True,
         related_name='validations_mission'
     )
+    statut = models.CharField(max_length=20, choices=STATUTS, default='EN_ATTENTE')
     date_validation = models.DateTimeField(null=True, blank=True)
-    statut = models.BooleanField(null=True, blank=True)
     commentaire = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'missions_workflow'
         verbose_name = 'Étape de validation de mission'
         verbose_name_plural = 'Étapes de validation des missions'
-        ordering = ['mission']
-        unique_together = ('mission', 'workflow')
-
+        ordering = ['mission', 'numero_etape']
     def __str__(self):
-        statut_label = "Validée" if self.statut else "En attente / Rejetée"
-        return f"{self.mission.numero_mission}"
+        return f"{self.mission.numero_mission} - Étape {self.numero_etape} ({self.libelle_etape}) : {self.get_statut_display()}"
 
