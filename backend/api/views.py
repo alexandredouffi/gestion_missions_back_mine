@@ -142,7 +142,7 @@ class VerifyOTPView(APIView):
 
 
 class UserView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         queryset = User.objects.all().order_by('id')
@@ -300,7 +300,7 @@ class EntiteView(APIView):
     def get_permissions(self):
         if self.request.method in ('POST', 'PUT', 'DELETE'):
             return [IsAdministrateur()]
-        return [IsAuthenticated()]
+        return [AllowAny()]
 
     def get(self, request):
         queryset = Entite.objects.all().order_by('id')
