@@ -300,7 +300,7 @@ class EntiteView(APIView):
     def get_permissions(self):
         if self.request.method in ('POST', 'PUT', 'DELETE'):
             return [IsAdministrateur()]
-        return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request):
         queryset = Entite.objects.all().order_by('id')
