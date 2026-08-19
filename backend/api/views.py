@@ -142,7 +142,7 @@ class VerifyOTPView(APIView):
 
 
 class UserView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         queryset = User.objects.all().order_by('id')
