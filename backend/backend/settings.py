@@ -44,9 +44,9 @@ DEBUG = True
 # ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
-FIXTURE_DIRS = [
-    os.path.join(BASE_DIR, 'fixtures'),
-]
+# FIXTURE_DIRS = [
+#     os.path.join(BASE_DIR, 'fixtures'),
+# ]
 # Application definition
 
 INSTALLED_APPS = [
