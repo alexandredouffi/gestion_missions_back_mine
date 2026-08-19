@@ -161,7 +161,7 @@ def _envoyer_async(subject, texte, html, *recipients):
             print(f"Envoi de l'email '{subject}' à {valides}...")
             msg = EmailMultiAlternatives(subject, texte, FROM, valides)
             msg.attach_alternative(html, 'text/html')
-            msg.send(fail_silently=True)
+            msg.send(fail_silently=False)
             _log(subject, valides, 'ENVOYE')
         except Exception as exc:
             print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
