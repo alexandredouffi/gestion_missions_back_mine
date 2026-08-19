@@ -314,7 +314,7 @@
     "pk": 1,
     "fields": {
       "sujet": "[Gestion Missions] Vous avez été ajouté à la mission 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:20:30.646Z"
@@ -325,7 +325,7 @@
     "pk": 2,
     "fields": {
       "sujet": "[Gestion Missions] Vous avez été ajouté à la mission 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:24:35.683Z"
@@ -336,7 +336,7 @@
     "pk": 3,
     "fields": {
       "sujet": "[Gestion Missions] Votre mission 50/DRH/AFCI/2026 a été soumise",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:33:23.858Z"
@@ -347,7 +347,7 @@
     "pk": 4,
     "fields": {
       "sujet": "[Gestion Missions] Mission 50/DRH/AFCI/2026 en attente de votre signature",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:33:26.196Z"
@@ -358,7 +358,7 @@
     "pk": 5,
     "fields": {
       "sujet": "[Gestion Missions] Confirmation de votre action — 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:37:02.274Z"
@@ -369,7 +369,7 @@
     "pk": 6,
     "fields": {
       "sujet": "[Gestion Missions] Mission 49/DRH/AFCI/2026 entièrement approuvée 🎉",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:37:04.861Z"
@@ -380,7 +380,7 @@
     "pk": 7,
     "fields": {
       "sujet": "[Gestion Missions] Mission 49/DRH/AFCI/2026 entièrement approuvée 🎉",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:37:07.237Z"
@@ -391,7 +391,7 @@
     "pk": 8,
     "fields": {
       "sujet": "[Gestion Missions] Confirmation de votre action — 50/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:37:34.766Z"
@@ -402,7 +402,7 @@
     "pk": 9,
     "fields": {
       "sujet": "[Gestion Missions] Mission 50/DRH/AFCI/2026 en attente de votre signature",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:37:37.020Z"
@@ -413,7 +413,7 @@
     "pk": 10,
     "fields": {
       "sujet": "[Gestion Missions] Confirmation de votre action — 50/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:43:55.116Z"
@@ -424,7 +424,7 @@
     "pk": 11,
     "fields": {
       "sujet": "[Gestion Missions] Paiement enregistré — 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:48:00.595Z"
@@ -435,7 +435,7 @@
     "pk": 12,
     "fields": {
       "sujet": "[Gestion Missions] Votre indemnité de mission a été payée — 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:48:02.942Z"
@@ -446,7 +446,7 @@
     "pk": 13,
     "fields": {
       "sujet": "[Gestion Missions] Paiement enregistré — 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:49:00.134Z"
@@ -457,7 +457,7 @@
     "pk": 14,
     "fields": {
       "sujet": "[Gestion Missions] Votre indemnité de mission a été payée — 49/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T12:49:02.660Z"
@@ -468,7 +468,7 @@
     "pk": 15,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:14:39.798Z"
@@ -479,7 +479,7 @@
     "pk": 16,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:17:00.890Z"
@@ -490,7 +490,7 @@
     "pk": 17,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:17:51.149Z"
@@ -501,7 +501,7 @@
     "pk": 18,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:19:47.261Z"
@@ -512,7 +512,7 @@
     "pk": 19,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:20:44.525Z"
@@ -523,7 +523,7 @@
     "pk": 20,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:23:02.920Z"
@@ -534,7 +534,7 @@
     "pk": 21,
     "fields": {
       "sujet": "[Gestion Missions] Votre mission 51/DRH/AFCI/2026 a été soumise",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:30:48.469Z"
@@ -545,7 +545,7 @@
     "pk": 22,
     "fields": {
       "sujet": "[Gestion Missions] Mission 51/DRH/AFCI/2026 en attente de votre signature",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:30:51.108Z"
@@ -556,7 +556,7 @@
     "pk": 23,
     "fields": {
       "sujet": "[Gestion Missions] Vous avez été ajouté à la mission 51/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:30:58.476Z"
@@ -567,7 +567,7 @@
     "pk": 24,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:33:03.053Z"
@@ -578,7 +578,7 @@
     "pk": 25,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:33:52.413Z"
@@ -589,7 +589,7 @@
     "pk": 26,
     "fields": {
       "sujet": "[Gestion Missions] Confirmation de votre action — 51/DRH/AFCI/2026",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:34:18.040Z"
@@ -600,7 +600,7 @@
     "pk": 27,
     "fields": {
       "sujet": "[Gestion Missions] Mission 51/DRH/AFCI/2026 entièrement approuvée 🎉",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:34:21.420Z"
@@ -611,7 +611,7 @@
     "pk": 28,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-27T13:34:32.045Z"
@@ -622,7 +622,7 @@
     "pk": 29,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T08:58:23.586Z"
@@ -633,7 +633,7 @@
     "pk": 30,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T13:39:55.766Z"
@@ -644,7 +644,7 @@
     "pk": 31,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T13:41:26.555Z"
@@ -655,7 +655,7 @@
     "pk": 32,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T15:56:15.824Z"
@@ -677,7 +677,7 @@
     "pk": 34,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T16:10:00.329Z"
@@ -688,7 +688,7 @@
     "pk": 35,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ECHEC",
       "erreur": "(502, b'5.7.0 Please authenticate first', 'alexandrekdouffi@gmail.com')",
       "date_envoi": "2026-05-28T16:29:51.712Z"
@@ -699,7 +699,7 @@
     "pk": 36,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ECHEC",
       "erreur": "(502, b'5.7.0 Please authenticate first', 'alexandrekdouffi@gmail.com')",
       "date_envoi": "2026-05-28T16:31:10.548Z"
@@ -710,7 +710,7 @@
     "pk": 37,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ECHEC",
       "erreur": "(502, b'5.7.0 Please authenticate first', 'alexandrekdouffi@gmail.com')",
       "date_envoi": "2026-05-28T16:31:43.612Z"
@@ -721,7 +721,7 @@
     "pk": 38,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T16:35:21.770Z"
@@ -732,7 +732,7 @@
     "pk": 39,
     "fields": {
       "sujet": "[Gestion Missions] Votre code de connexion",
-      "destinataires": "angejoelziade@gmail.com",
+      "destinataires": "alexandrekdouffi@gmail.com",
       "statut": "ENVOYE",
       "erreur": null,
       "date_envoi": "2026-05-28T16:43:18.796Z"
@@ -1523,7 +1523,7 @@
       "fonction": "Project Manager",
       "date_naissance": "1994-10-18",
       "telephone": "+2250556925972",
-      "email_reciever": "angejoelziade@gmail.com",
+      "email_reciever": "alexandrekdouffi@gmail.com",
       "filiale": 3,
       "profil": 14,
       "category": 1,
@@ -1577,7 +1577,7 @@
       "fonction": "Signataire 1",
       "date_naissance": "1900-01-01",
       "telephone": "055925972",
-      "email_reciever": "angejoelziade@gmail.com",
+      "email_reciever": "alexandrekdouffi@gmail.com",
       "filiale": 3,
       "profil": 12,
       "category": 1,
@@ -1604,7 +1604,7 @@
       "fonction": "Signataire 2",
       "date_naissance": "1900-01-01",
       "telephone": "0323456786",
-      "email_reciever": "angejoelziade@gmail.com",
+      "email_reciever": "alexandrekdouffi@gmail.com",
       "filiale": 3,
       "profil": 12,
       "category": 1,
@@ -1631,7 +1631,7 @@
       "fonction": "tresorier",
       "date_naissance": "1900-01-01",
       "telephone": "03030303030",
-      "email_reciever": "angejoelziade@gmail.com",
+      "email_reciever": "alexandrekdouffi@gmail.com",
       "filiale": 3,
       "profil": 13,
       "category": 1,
@@ -1658,7 +1658,7 @@
       "fonction": "Comptable",
       "date_naissance": "1900-01-01",
       "telephone": "123456789",
-      "email_reciever": "angejoelziade@gmail.com",
+      "email_reciever": "alexandrekdouffi@gmail.com",
       "filiale": 3,
       "profil": 11,
       "category": 1,
@@ -1685,7 +1685,7 @@
       "fonction": "RSI",
       "date_naissance": "1900-01-01",
       "telephone": "000000000",
-      "email_reciever": "angejoelziade@gmail.com",
+      "email_reciever": "alexandrekdouffi@gmail.com",
       "filiale": 3,
       "profil": 14,
       "category": 1,
