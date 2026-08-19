@@ -1,5 +1,8 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
+from concurrent.futures import ThreadPoolExecutor
+
+executor = ThreadPoolExecutor(max_workers=4)
 
 FROM = settings.DEFAULT_FROM_EMAIL
 
@@ -147,21 +150,41 @@ def _info_block(libelle, valeur):
         f'</tr></table>'
     )
 
-
-def _envoyer(subject, texte, html, *recipients):
+def _envoyer_async(subject, texte, html, *recipients):
     valides = [e for e in recipients if e]
     if not valides:
         _log(subject, [], 'IGNORE')
         return
-    try:
-        print(f"Envoi de l'email '{subject}' à {valides}...")
-        msg = EmailMultiAlternatives(subject, texte, FROM, valides)
-        msg.attach_alternative(html, 'text/html')
-        msg.send()
-        _log(subject, valides, 'ENVOYE')
-    except Exception as exc:
-        print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
-        _log(subject, valides, 'ECHEC', erreur=str(exc))
+
+    def _send():
+        try:
+            print(f"Envoi de l'email '{subject}' à {valides}...")
+            msg = EmailMultiAlternatives(subject, texte, FROM, valides)
+            msg.attach_alternative(html, 'text/html')
+            msg.send(fail_silently=True)
+            _log(subject, valides, 'ENVOYE')
+        except Exception as exc:
+            print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
+            _log(subject, valides, 'ECHEC', erreur=str(exc))
+
+    executor.submit(_send)
+
+
+def _envoyer(subject, texte, html, *recipients):
+    _envoyer_async(subject, texte, html, *recipients)
+    # valides = [e for e in recipients if e]
+    # if not valides:
+    #     _log(subject, [], 'IGNORE')
+    #     return
+    # try:
+    #     print(f"Envoi de l'email '{subject}' à {valides}...")
+    #     msg = EmailMultiAlternatives(subject, texte, FROM, valides)
+    #     msg.attach_alternative(html, 'text/html')
+    #     msg.send()
+    #     _log(subject, valides, 'ENVOYE')
+    # except Exception as exc:
+    #     print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
+    #     _log(subject, valides, 'ECHEC', erreur=str(exc))
 
 
 # ── 0. OTP ──────────────────────────────────────────────────────────────────
