@@ -42,7 +42,7 @@ DEBUG = True
 #     '127.0.0.1',
 #     'localhost',
 # ]
-
+ 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
