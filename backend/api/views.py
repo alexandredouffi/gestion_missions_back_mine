@@ -398,7 +398,7 @@ class EntiteDetailView(APIView):
 
 
 class ProfilView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         queryset = Profil.objects.all().order_by('id')
