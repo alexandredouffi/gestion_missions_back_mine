@@ -1,0 +1,2292 @@
+[
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "admin", "model": "logentry" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "auth", "model": "permission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "auth", "model": "group" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "contenttypes", "model": "contenttype" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "sessions", "model": "session" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "user" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "entite" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "authtoken", "model": "token" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "authtoken", "model": "tokenproxy" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "profil" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "categorieemploye" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "destination" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "bareme" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "direction" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "mission" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "workflow" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "userworkflow" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "missionworkflow" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "delegation" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "paiement" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "piecejustificative" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "justificationhebergement" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "notificationlog" }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "fields": { "app_label": "api", "model": "otpcode" }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "45s2z6sisbnsctyrhx8dqp7l9d19kgwr",
+    "fields": {
+      "session_data": ".eJxVjEEOwiAQAP_C2RCWsgIevfsGwsIiVUOT0p6MfzckPeh1ZjJvEeK-1bB3XsOcxUWAOP0yiunJbYj8iO2-yLS0bZ1JjkQetsvbkvl1Pdq_QY29ji1bpMmxyalQAUUGtHMAYJUtzrKbEqJGX8rZI9joNBuTEVmTKUp78fkC0hg3Iw:1vE30A:_AmRsPNCMW9AxIVawnJJCUmFvgaJua0CBLrfvigWuYs",
+      "expire_date": "2025-11-12T10:01:58.621Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "iq5mzcacf6r8xw69mw5s4ow642g0v6ld",
+    "fields": {
+      "session_data": ".eJxVjEEOwiAQAP_C2RCWsgIevfsGwsIiVUOT0p6MfzckPeh1ZjJvEeK-1bB3XsOcxUWAOP0yiunJbYj8iO2-yLS0bZ1JjkQetsvbkvl1Pdq_QY29ji1bpMmxyalQAUUGtHMAYJUtzrKbEqJGX8rZI9joNBuTEVmTKUp78fkC0hg3Iw:1wMlz6:lyNUzhYGL4lBV6q-j-XoYwZBUxo-CGiNdJlFLq20DiI",
+      "expire_date": "2026-05-26T12:13:12.512Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "rc0qsuf4tlshkfcsjs5peo7vzeqp2mv9",
+    "fields": {
+      "session_data": ".eJxVjMsOwiAQRf-FtSFF5DEu3fcbyAAzUjU0Ke3K-O_SpAvdnnvOfYuA21rC1mgJUxZX4cTpl0VMT6r7kB9Y77NMc12XKcpdkcfa5Dhnet0O9--gYCu9thZTZp09kYaBaGCjQZFzLoG1AOcIkS8dW0b2SVs2icEYpTz3EsXnCwV5OPM:1wSavh:C1zcSOj6BwxzlpW7JSUhL0Cl6mGOJfqp2HUJtwY7FaE",
+      "expire_date": "2026-06-11T13:37:45.123Z"
+    }
+  },
+  {
+    "model": "api.entite",
+    "pk": 3,
+    "fields": { "nom": "AFITECH CI", "abreviation": "AFCI" }
+  },
+  {
+    "model": "api.entite",
+    "pk": 4,
+    "fields": { "nom": "AFITECH SENEGAL", "abreviation": "AFSN" }
+  },
+  {
+    "model": "api.entite",
+    "pk": 5,
+    "fields": { "nom": "AFITECH MALI", "abreviation": "AFML" }
+  },
+  {
+    "model": "api.direction",
+    "pk": 5,
+    "fields": {
+      "nom": "DE",
+      "filiale": 3,
+      "description": "Direction d'exploitation"
+    }
+  },
+  {
+    "model": "api.direction",
+    "pk": 6,
+    "fields": {
+      "nom": "Direction Générale",
+      "filiale": 3,
+      "description": "Direction Générale"
+    }
+  },
+  {
+    "model": "api.profil",
+    "pk": 10,
+    "fields": {
+      "nom": "Utilisateur classique",
+      "description": "Accès standard à la gestion des missions"
+    }
+  },
+  {
+    "model": "api.profil",
+    "pk": 11,
+    "fields": {
+      "nom": "Comptable",
+      "description": "Accès aux justificatifs de toutes les missions"
+    }
+  },
+  {
+    "model": "api.profil",
+    "pk": 12,
+    "fields": {
+      "nom": "Signataire",
+      "description": "Approbation et rejet des étapes de workflow"
+    }
+  },
+  {
+    "model": "api.profil",
+    "pk": 13,
+    "fields": {
+      "nom": "Trésorier",
+      "description": "Enregistrement des paiements de missions"
+    }
+  },
+  {
+    "model": "api.profil",
+    "pk": 14,
+    "fields": {
+      "nom": "Administrateur",
+      "description": "Gestion des référentiels (entités, barèmes, workflows)"
+    }
+  },
+  {
+    "model": "api.categorieemploye",
+    "pk": 1,
+    "fields": { "nom": "DIRECTEUR", "description": "" }
+  },
+  {
+    "model": "api.categorieemploye",
+    "pk": 2,
+    "fields": { "nom": "AGENT", "description": "" }
+  },
+  {
+    "model": "api.categorieemploye",
+    "pk": 3,
+    "fields": { "nom": "CADRE", "description": null }
+  },
+  {
+    "model": "api.destination",
+    "pk": 1,
+    "fields": { "nom": "Afrique de l'Ouest", "description": "" }
+  },
+  {
+    "model": "api.destination",
+    "pk": 2,
+    "fields": { "nom": "Europe", "description": "" }
+  },
+  {
+    "model": "api.destination",
+    "pk": 3,
+    "fields": { "nom": "Asie", "description": "" }
+  },
+  {
+    "model": "api.destination",
+    "pk": 5,
+    "fields": { "nom": "Amérique du Nord", "description": "" }
+  },
+  {
+    "model": "api.destination",
+    "pk": 6,
+    "fields": { "nom": "Amérique du Sud", "description": "" }
+  },
+  {
+    "model": "api.destination",
+    "pk": 7,
+    "fields": { "nom": "Afrique du Sud", "description": "" }
+  },
+  {
+    "model": "api.destination",
+    "pk": 8,
+    "fields": { "nom": "Afrique de l'Est", "description": "" }
+  },
+  {
+    "model": "api.bareme",
+    "pk": 8,
+    "fields": {
+      "filiale": 3,
+      "categorie": 1,
+      "destination": 1,
+      "hebergement": 50000,
+      "perdiem": 20000,
+      "communication": 5000,
+      "transport": 5000,
+      "forfait": 0,
+      "longue_duree": 0
+    }
+  },
+  {
+    "model": "api.bareme",
+    "pk": 9,
+    "fields": {
+      "filiale": 3,
+      "categorie": 2,
+      "destination": 1,
+      "hebergement": 10000,
+      "perdiem": 5000,
+      "communication": 0,
+      "transport": 0,
+      "forfait": 0,
+      "longue_duree": 0
+    }
+  },
+  {
+    "model": "api.bareme",
+    "pk": 10,
+    "fields": {
+      "filiale": 3,
+      "categorie": 3,
+      "destination": 1,
+      "hebergement": 20000,
+      "perdiem": 10000,
+      "communication": 0,
+      "transport": 0,
+      "forfait": 0,
+      "longue_duree": 0
+    }
+  },
+  {
+    "model": "api.piecejustificative",
+    "pk": 7,
+    "fields": {
+      "justification": 14,
+      "libelle": "Hotel",
+      "montant": "150000.00",
+      "document": "justifications/2026/05/018-LONACI-Agrément_dun_nouvel_opérateur_de_jeux_RZ5b147.pdf",
+      "date_ajout": "2026-05-27T10:13:43.558Z"
+    }
+  },
+  {
+    "model": "api.piecejustificative",
+    "pk": 8,
+    "fields": {
+      "justification": 15,
+      "libelle": "Hotel",
+      "montant": "150000.00",
+      "document": "justifications/2026/05/019-LONACI-Demande_de_connexion_aux_plateformes_des_sociétés_AFIT_45v5DZk.pdf",
+      "date_ajout": "2026-05-27T10:15:17.703Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 1,
+    "fields": {
+      "sujet": "[Gestion Missions] Vous avez été ajouté à la mission 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:20:30.646Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 2,
+    "fields": {
+      "sujet": "[Gestion Missions] Vous avez été ajouté à la mission 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:24:35.683Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 3,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre mission 50/DRH/AFCI/2026 a été soumise",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:33:23.858Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 4,
+    "fields": {
+      "sujet": "[Gestion Missions] Mission 50/DRH/AFCI/2026 en attente de votre signature",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:33:26.196Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 5,
+    "fields": {
+      "sujet": "[Gestion Missions] Confirmation de votre action — 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:37:02.274Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 6,
+    "fields": {
+      "sujet": "[Gestion Missions] Mission 49/DRH/AFCI/2026 entièrement approuvée 🎉",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:37:04.861Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 7,
+    "fields": {
+      "sujet": "[Gestion Missions] Mission 49/DRH/AFCI/2026 entièrement approuvée 🎉",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:37:07.237Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 8,
+    "fields": {
+      "sujet": "[Gestion Missions] Confirmation de votre action — 50/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:37:34.766Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 9,
+    "fields": {
+      "sujet": "[Gestion Missions] Mission 50/DRH/AFCI/2026 en attente de votre signature",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:37:37.020Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 10,
+    "fields": {
+      "sujet": "[Gestion Missions] Confirmation de votre action — 50/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:43:55.116Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 11,
+    "fields": {
+      "sujet": "[Gestion Missions] Paiement enregistré — 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:48:00.595Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 12,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre indemnité de mission a été payée — 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:48:02.942Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 13,
+    "fields": {
+      "sujet": "[Gestion Missions] Paiement enregistré — 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:49:00.134Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 14,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre indemnité de mission a été payée — 49/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T12:49:02.660Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 15,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:14:39.798Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 16,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:17:00.890Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 17,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:17:51.149Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 18,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:19:47.261Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 19,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:20:44.525Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 20,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:23:02.920Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 21,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre mission 51/DRH/AFCI/2026 a été soumise",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:30:48.469Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 22,
+    "fields": {
+      "sujet": "[Gestion Missions] Mission 51/DRH/AFCI/2026 en attente de votre signature",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:30:51.108Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 23,
+    "fields": {
+      "sujet": "[Gestion Missions] Vous avez été ajouté à la mission 51/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:30:58.476Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 24,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:33:03.053Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 25,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:33:52.413Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 26,
+    "fields": {
+      "sujet": "[Gestion Missions] Confirmation de votre action — 51/DRH/AFCI/2026",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:34:18.040Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 27,
+    "fields": {
+      "sujet": "[Gestion Missions] Mission 51/DRH/AFCI/2026 entièrement approuvée 🎉",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:34:21.420Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 28,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-27T13:34:32.045Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 29,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T08:58:23.586Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 30,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T13:39:55.766Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 31,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T13:41:26.555Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 32,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T15:56:15.824Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 33,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "",
+      "statut": "IGNORE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T15:57:10.876Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 34,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T16:10:00.329Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 35,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ECHEC",
+      "erreur": "(502, b'5.7.0 Please authenticate first', 'alexandrekdouffi@gmail.com')",
+      "date_envoi": "2026-05-28T16:29:51.712Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 36,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ECHEC",
+      "erreur": "(502, b'5.7.0 Please authenticate first', 'alexandrekdouffi@gmail.com')",
+      "date_envoi": "2026-05-28T16:31:10.548Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 37,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ECHEC",
+      "erreur": "(502, b'5.7.0 Please authenticate first', 'alexandrekdouffi@gmail.com')",
+      "date_envoi": "2026-05-28T16:31:43.612Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 38,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T16:35:21.770Z"
+    }
+  },
+  {
+    "model": "api.notificationlog",
+    "pk": 39,
+    "fields": {
+      "sujet": "[Gestion Missions] Votre code de connexion",
+      "destinataires": "angejoelziade@gmail.com",
+      "statut": "ENVOYE",
+      "erreur": null,
+      "date_envoi": "2026-05-28T16:43:18.796Z"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "add_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "change_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "delete_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view log entry",
+      "content_type": ["admin", "logentry"],
+      "codename": "view_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add permission",
+      "content_type": ["auth", "permission"],
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change permission",
+      "content_type": ["auth", "permission"],
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": ["auth", "permission"],
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view permission",
+      "content_type": ["auth", "permission"],
+      "codename": "view_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add group",
+      "content_type": ["auth", "group"],
+      "codename": "add_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change group",
+      "content_type": ["auth", "group"],
+      "codename": "change_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete group",
+      "content_type": ["auth", "group"],
+      "codename": "delete_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view group",
+      "content_type": ["auth", "group"],
+      "codename": "view_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "add_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "change_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "delete_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view content type",
+      "content_type": ["contenttypes", "contenttype"],
+      "codename": "view_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add session",
+      "content_type": ["sessions", "session"],
+      "codename": "add_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change session",
+      "content_type": ["sessions", "session"],
+      "codename": "change_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete session",
+      "content_type": ["sessions", "session"],
+      "codename": "delete_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view session",
+      "content_type": ["sessions", "session"],
+      "codename": "view_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add user",
+      "content_type": ["api", "user"],
+      "codename": "add_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change user",
+      "content_type": ["api", "user"],
+      "codename": "change_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete user",
+      "content_type": ["api", "user"],
+      "codename": "delete_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view user",
+      "content_type": ["api", "user"],
+      "codename": "view_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add entite",
+      "content_type": ["api", "entite"],
+      "codename": "add_entite"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change entite",
+      "content_type": ["api", "entite"],
+      "codename": "change_entite"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete entite",
+      "content_type": ["api", "entite"],
+      "codename": "delete_entite"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view entite",
+      "content_type": ["api", "entite"],
+      "codename": "view_entite"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Token",
+      "content_type": ["authtoken", "token"],
+      "codename": "add_token"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Token",
+      "content_type": ["authtoken", "token"],
+      "codename": "change_token"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Token",
+      "content_type": ["authtoken", "token"],
+      "codename": "delete_token"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Token",
+      "content_type": ["authtoken", "token"],
+      "codename": "view_token"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Token",
+      "content_type": ["authtoken", "tokenproxy"],
+      "codename": "add_tokenproxy"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Token",
+      "content_type": ["authtoken", "tokenproxy"],
+      "codename": "change_tokenproxy"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Token",
+      "content_type": ["authtoken", "tokenproxy"],
+      "codename": "delete_tokenproxy"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Token",
+      "content_type": ["authtoken", "tokenproxy"],
+      "codename": "view_tokenproxy"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add profil",
+      "content_type": ["api", "profil"],
+      "codename": "add_profil"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change profil",
+      "content_type": ["api", "profil"],
+      "codename": "change_profil"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete profil",
+      "content_type": ["api", "profil"],
+      "codename": "delete_profil"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view profil",
+      "content_type": ["api", "profil"],
+      "codename": "view_profil"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Categorie Employe",
+      "content_type": ["api", "categorieemploye"],
+      "codename": "add_categorieemploye"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Categorie Employe",
+      "content_type": ["api", "categorieemploye"],
+      "codename": "change_categorieemploye"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Categorie Employe",
+      "content_type": ["api", "categorieemploye"],
+      "codename": "delete_categorieemploye"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Categorie Employe",
+      "content_type": ["api", "categorieemploye"],
+      "codename": "view_categorieemploye"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Destination",
+      "content_type": ["api", "destination"],
+      "codename": "add_destination"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Destination",
+      "content_type": ["api", "destination"],
+      "codename": "change_destination"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Destination",
+      "content_type": ["api", "destination"],
+      "codename": "delete_destination"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Destination",
+      "content_type": ["api", "destination"],
+      "codename": "view_destination"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Indemnité de mission",
+      "content_type": ["api", "bareme"],
+      "codename": "add_bareme"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Indemnité de mission",
+      "content_type": ["api", "bareme"],
+      "codename": "change_bareme"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Indemnité de mission",
+      "content_type": ["api", "bareme"],
+      "codename": "delete_bareme"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Indemnité de mission",
+      "content_type": ["api", "bareme"],
+      "codename": "view_bareme"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Direction",
+      "content_type": ["api", "direction"],
+      "codename": "add_direction"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Direction",
+      "content_type": ["api", "direction"],
+      "codename": "change_direction"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Direction",
+      "content_type": ["api", "direction"],
+      "codename": "delete_direction"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Direction",
+      "content_type": ["api", "direction"],
+      "codename": "view_direction"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Mission",
+      "content_type": ["api", "mission"],
+      "codename": "add_mission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Mission",
+      "content_type": ["api", "mission"],
+      "codename": "change_mission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Mission",
+      "content_type": ["api", "mission"],
+      "codename": "delete_mission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Mission",
+      "content_type": ["api", "mission"],
+      "codename": "view_mission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Workflow",
+      "content_type": ["api", "workflow"],
+      "codename": "add_workflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Workflow",
+      "content_type": ["api", "workflow"],
+      "codename": "change_workflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Workflow",
+      "content_type": ["api", "workflow"],
+      "codename": "delete_workflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Workflow",
+      "content_type": ["api", "workflow"],
+      "codename": "view_workflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Utilisateur Workflow",
+      "content_type": ["api", "userworkflow"],
+      "codename": "add_userworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Utilisateur Workflow",
+      "content_type": ["api", "userworkflow"],
+      "codename": "change_userworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Utilisateur Workflow",
+      "content_type": ["api", "userworkflow"],
+      "codename": "delete_userworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Utilisateur Workflow",
+      "content_type": ["api", "userworkflow"],
+      "codename": "view_userworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Étape de validation de mission",
+      "content_type": ["api", "missionworkflow"],
+      "codename": "add_missionworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Étape de validation de mission",
+      "content_type": ["api", "missionworkflow"],
+      "codename": "change_missionworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Étape de validation de mission",
+      "content_type": ["api", "missionworkflow"],
+      "codename": "delete_missionworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Étape de validation de mission",
+      "content_type": ["api", "missionworkflow"],
+      "codename": "view_missionworkflow"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Membre de délégation",
+      "content_type": ["api", "delegation"],
+      "codename": "add_delegation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Membre de délégation",
+      "content_type": ["api", "delegation"],
+      "codename": "change_delegation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Membre de délégation",
+      "content_type": ["api", "delegation"],
+      "codename": "delete_delegation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Membre de délégation",
+      "content_type": ["api", "delegation"],
+      "codename": "view_delegation"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Paiement",
+      "content_type": ["api", "paiement"],
+      "codename": "add_paiement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Paiement",
+      "content_type": ["api", "paiement"],
+      "codename": "change_paiement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Paiement",
+      "content_type": ["api", "paiement"],
+      "codename": "delete_paiement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Paiement",
+      "content_type": ["api", "paiement"],
+      "codename": "view_paiement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Pièce justificative",
+      "content_type": ["api", "piecejustificative"],
+      "codename": "add_piecejustificative"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Pièce justificative",
+      "content_type": ["api", "piecejustificative"],
+      "codename": "change_piecejustificative"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Pièce justificative",
+      "content_type": ["api", "piecejustificative"],
+      "codename": "delete_piecejustificative"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Pièce justificative",
+      "content_type": ["api", "piecejustificative"],
+      "codename": "view_piecejustificative"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Justification hébergement",
+      "content_type": ["api", "justificationhebergement"],
+      "codename": "add_justificationhebergement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Justification hébergement",
+      "content_type": ["api", "justificationhebergement"],
+      "codename": "change_justificationhebergement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Justification hébergement",
+      "content_type": ["api", "justificationhebergement"],
+      "codename": "delete_justificationhebergement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Justification hébergement",
+      "content_type": ["api", "justificationhebergement"],
+      "codename": "view_justificationhebergement"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Log notification email",
+      "content_type": ["api", "notificationlog"],
+      "codename": "add_notificationlog"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Log notification email",
+      "content_type": ["api", "notificationlog"],
+      "codename": "change_notificationlog"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Log notification email",
+      "content_type": ["api", "notificationlog"],
+      "codename": "delete_notificationlog"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Log notification email",
+      "content_type": ["api", "notificationlog"],
+      "codename": "view_notificationlog"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can add Code OTP",
+      "content_type": ["api", "otpcode"],
+      "codename": "add_otpcode"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can change Code OTP",
+      "content_type": ["api", "otpcode"],
+      "codename": "change_otpcode"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can delete Code OTP",
+      "content_type": ["api", "otpcode"],
+      "codename": "delete_otpcode"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "fields": {
+      "name": "Can view Code OTP",
+      "content_type": ["api", "otpcode"],
+      "codename": "view_otpcode"
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$ZEDqnxQ1jddiZnZg1w8eju$veE7/X3K2BnDJRgXoyAxU+oEk8Sjqp9iROnWOk9SLqQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "ange.ziade",
+      "first_name": "Ange Joel",
+      "last_name": "ZIADE",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-12T15:01:10Z",
+      "matricule": "001",
+      "fonction": "Project Manager",
+      "date_naissance": "1994-10-18",
+      "telephone": "+2250556925972",
+      "email_reciever": "angejoelziade@gmail.com",
+      "filiale": 3,
+      "profil": 14,
+      "category": 1,
+      "direction": 5,
+      "groups": [],
+      "user_permissions": [["change_direction", "api", "direction"]],
+      "filiales_attribuees": []
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$xhvSurp7rdpoDvfGSOrT25$a4P0BGWw6duCu6lP6OrOK2nsqFRBP/lvUFlNhsFbUSU=",
+      "last_login": "2026-05-28T13:37:45.122Z",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@admin.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-05-19T13:54:49.265Z",
+      "matricule": "Inconnu",
+      "fonction": "Inconnu",
+      "date_naissance": "1900-01-01",
+      "telephone": "Inconnu",
+      "email_reciever": "Inconnu",
+      "filiale": null,
+      "profil": null,
+      "category": null,
+      "direction": null,
+      "groups": [],
+      "user_permissions": [],
+      "filiales_attribuees": []
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$IkpVegcLFkdPnzZu5obRCn$aw9bbpJFes3VOwtmnZdSasSHek6gdgCEqWHwXretOw0=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "direction.generale",
+      "first_name": "Generale",
+      "last_name": "Direction",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-26T14:59:01.577Z",
+      "matricule": "EMEZ",
+      "fonction": "Signataire 1",
+      "date_naissance": "1900-01-01",
+      "telephone": "055925972",
+      "email_reciever": "angejoelziade@gmail.com",
+      "filiale": 3,
+      "profil": 12,
+      "category": 1,
+      "direction": 5,
+      "groups": [],
+      "user_permissions": [],
+      "filiales_attribuees": [3]
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$JcdRrzu6ZCXLyyjeSDvPkB$j26W5Q79Ua7xDlhJ50nIi+s6otCFXL+48ZKK4rJK2rQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "ressources.humaines",
+      "first_name": "Humaines",
+      "last_name": "Ressources",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-26T15:01:07.889Z",
+      "matricule": "AZE",
+      "fonction": "Signataire 2",
+      "date_naissance": "1900-01-01",
+      "telephone": "0323456786",
+      "email_reciever": "angejoelziade@gmail.com",
+      "filiale": 3,
+      "profil": 12,
+      "category": 1,
+      "direction": 5,
+      "groups": [],
+      "user_permissions": [],
+      "filiales_attribuees": [3, 4]
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$x3FSCdlRpXXdAOMjJcJwxv$A5nkCjDMUxftYBzSskjY3AOegsCSvau2Bl6mGtUMQTw=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "tresorier.filiale",
+      "first_name": "Filiale",
+      "last_name": "Tresorier",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-26T15:04:39.754Z",
+      "matricule": "AS",
+      "fonction": "tresorier",
+      "date_naissance": "1900-01-01",
+      "telephone": "03030303030",
+      "email_reciever": "angejoelziade@gmail.com",
+      "filiale": 3,
+      "profil": 13,
+      "category": 1,
+      "direction": 6,
+      "groups": [],
+      "user_permissions": [],
+      "filiales_attribuees": [3]
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$DdZI8A7IU8JPTphlW2djMt$9kUdgY5kDlnzZ3k6wWnDQ3ZNJSoikslDutI4Iol/f5A=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "comptable.filiale",
+      "first_name": "Filiale",
+      "last_name": "Comptable",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-26T15:05:34.020Z",
+      "matricule": "DREEZ",
+      "fonction": "Comptable",
+      "date_naissance": "1900-01-01",
+      "telephone": "123456789",
+      "email_reciever": "angejoelziade@gmail.com",
+      "filiale": 3,
+      "profil": 11,
+      "category": 1,
+      "direction": 6,
+      "groups": [],
+      "user_permissions": [],
+      "filiales_attribuees": [3, 4, 5]
+    }
+  },
+  {
+    "model": "api.user",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$OoIRhVwpbdCzMBhHIicfIB$RzStMVRZV9CZr2hZAYLj23brtC2Xc6cFUEskif4HMKQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "ismael.ndja",
+      "first_name": "Ismael",
+      "last_name": "N'dja",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-05-27T12:53:15.833Z",
+      "matricule": "AUCUN",
+      "fonction": "RSI",
+      "date_naissance": "1900-01-01",
+      "telephone": "000000000",
+      "email_reciever": "angejoelziade@gmail.com",
+      "filiale": 3,
+      "profil": 14,
+      "category": 1,
+      "direction": 5,
+      "groups": [],
+      "user_permissions": [],
+      "filiales_attribuees": []
+    }
+  },
+  {
+    "model": "api.mission",
+    "pk": 46,
+    "fields": {
+      "date_demande": "2026-05-27",
+      "entite": 3,
+      "objet_mission": "Formation Python Avancé",
+      "date_depart": "2026-05-28",
+      "date_retour": "2026-05-31",
+      "lieu_mission": "Ghana",
+      "statut_mission": "APPROUVEE",
+      "numero_mission": "46/DRH/AFCI/2026",
+      "destination_mission": 1,
+      "contexte_mission": "Contexte",
+      "objectifs_mission": "Objectif",
+      "frais_extra": "100000.00",
+      "demandeur": ["ange.ziade"]
+    }
+  },
+  {
+    "model": "api.mission",
+    "pk": 49,
+    "fields": {
+      "date_demande": "2026-05-27",
+      "entite": 3,
+      "objet_mission": "Mission de suivi et d’amélioration des processus opérationnels",
+      "date_depart": "2026-05-27",
+      "date_retour": "2026-05-30",
+      "lieu_mission": "Mali",
+      "statut_mission": "APPROUVEE",
+      "numero_mission": "49/DRH/AFCI/2026",
+      "destination_mission": 1,
+      "contexte_mission": "Dans le cadre de l’optimisation des activités internes et de l’amélioration continue des performances, une mission a été initiée afin d’analyser les processus opérationnels existants, identifier les points de blocage et proposer des solutions adaptées permettant de renforcer l’efficacité des équipes et la qualité des services fournis.",
+      "objectifs_mission": "Analyser les processus opérationnels actuellement en place ;\nIdentifier les insuffisances et les axes d’amélioration ;\nProposer des recommandations pour optimiser les procédures ;\nAméliorer la coordination entre les différentes équipes ;\nMettre en place des outils de suivi et de reporting adaptés ;\nContribuer à l’amélioration globale de la performance opérationnelle.",
+      "frais_extra": "0.00",
+      "demandeur": ["ange.ziade"]
+    }
+  },
+  {
+    "model": "api.mission",
+    "pk": 50,
+    "fields": {
+      "date_demande": "2026-05-27",
+      "entite": 3,
+      "objet_mission": "Mission Test",
+      "date_depart": "2026-05-28",
+      "date_retour": "2026-05-31",
+      "lieu_mission": "Test",
+      "statut_mission": "APPROUVEE",
+      "numero_mission": "50/DRH/AFCI/2026",
+      "destination_mission": 1,
+      "contexte_mission": "TEST",
+      "objectifs_mission": "TEST",
+      "frais_extra": "0.00",
+      "demandeur": ["ange.ziade"]
+    }
+  },
+  {
+    "model": "api.mission",
+    "pk": 51,
+    "fields": {
+      "date_demande": "2026-05-27",
+      "entite": 3,
+      "objet_mission": "Test 2",
+      "date_depart": "2026-05-28",
+      "date_retour": "2026-05-31",
+      "lieu_mission": "Test",
+      "statut_mission": "APPROUVEE",
+      "numero_mission": "51/DRH/AFCI/2026",
+      "destination_mission": 1,
+      "contexte_mission": "TEST",
+      "objectifs_mission": "TEST",
+      "frais_extra": "0.00",
+      "demandeur": ["ange.ziade"]
+    }
+  },
+  {
+    "model": "api.workflow",
+    "pk": 1,
+    "fields": {
+      "filiale": 3,
+      "numero_etape": 1,
+      "libelle_etape": "Direction générale",
+      "user": ["direction.generale"]
+    }
+  },
+  {
+    "model": "api.delegation",
+    "pk": 83,
+    "fields": {
+      "mission": 46,
+      "employe": ["ange.ziade"],
+      "est_chef": false,
+      "bareme": 8,
+      "duree": 4,
+      "est_longue_duree": false,
+      "montant_hebergement": "150000.00",
+      "montant_perdiem": "80000.00",
+      "montant_communication": "5000.00",
+      "montant_transport": "5000.00",
+      "montant_total": "240000.00"
+    }
+  },
+  {
+    "model": "api.delegation",
+    "pk": 84,
+    "fields": {
+      "mission": 46,
+      "employe": ["comptable.filiale"],
+      "est_chef": true,
+      "bareme": 8,
+      "duree": 4,
+      "est_longue_duree": false,
+      "montant_hebergement": "150000.00",
+      "montant_perdiem": "80000.00",
+      "montant_communication": "5000.00",
+      "montant_transport": "5000.00",
+      "montant_total": "240000.00"
+    }
+  },
+  {
+    "model": "api.delegation",
+    "pk": 87,
+    "fields": {
+      "mission": 49,
+      "employe": ["ange.ziade"],
+      "est_chef": false,
+      "bareme": 8,
+      "duree": 4,
+      "est_longue_duree": false,
+      "montant_hebergement": "150000.00",
+      "montant_perdiem": "80000.00",
+      "montant_communication": "5000.00",
+      "montant_transport": "5000.00",
+      "montant_total": "240000.00"
+    }
+  },
+  {
+    "model": "api.delegation",
+    "pk": 88,
+    "fields": {
+      "mission": 49,
+      "employe": ["tresorier.filiale"],
+      "est_chef": false,
+      "bareme": 8,
+      "duree": 4,
+      "est_longue_duree": false,
+      "montant_hebergement": "150000.00",
+      "montant_perdiem": "80000.00",
+      "montant_communication": "5000.00",
+      "montant_transport": "5000.00",
+      "montant_total": "240000.00"
+    }
+  },
+  {
+    "model": "api.delegation",
+    "pk": 89,
+    "fields": {
+      "mission": 51,
+      "employe": ["ange.ziade"],
+      "est_chef": true,
+      "bareme": 8,
+      "duree": 4,
+      "est_longue_duree": false,
+      "montant_hebergement": "150000.00",
+      "montant_perdiem": "80000.00",
+      "montant_communication": "5000.00",
+      "montant_transport": "5000.00",
+      "montant_total": "240000.00"
+    }
+  },
+  {
+    "model": "api.paiement",
+    "pk": 13,
+    "fields": {
+      "delegation": 83,
+      "mode": "LIQUIDE",
+      "montant": "240000.00",
+      "reference_cheque": null,
+      "cheque_document": "",
+      "date_paiement": "2026-05-27",
+      "effectue": true,
+      "enregistre_par": ["tresorier.filiale"]
+    }
+  },
+  {
+    "model": "api.paiement",
+    "pk": 14,
+    "fields": {
+      "delegation": 84,
+      "mode": "CHEQUE",
+      "montant": "240000.00",
+      "reference_cheque": "REF-CHEQ-001",
+      "cheque_document": "",
+      "date_paiement": "2026-05-27",
+      "effectue": true,
+      "enregistre_par": ["tresorier.filiale"]
+    }
+  },
+  {
+    "model": "api.paiement",
+    "pk": 15,
+    "fields": {
+      "delegation": 87,
+      "mode": "LIQUIDE",
+      "montant": "240000.00",
+      "reference_cheque": null,
+      "cheque_document": "",
+      "date_paiement": "2026-05-27",
+      "effectue": true,
+      "enregistre_par": ["tresorier.filiale"]
+    }
+  },
+  {
+    "model": "api.paiement",
+    "pk": 16,
+    "fields": {
+      "delegation": 88,
+      "mode": "CHEQUE",
+      "montant": "240000.00",
+      "reference_cheque": "CH300",
+      "cheque_document": "",
+      "date_paiement": "2026-05-27",
+      "effectue": true,
+      "enregistre_par": ["tresorier.filiale"]
+    }
+  },
+  {
+    "model": "api.justificationhebergement",
+    "pk": 14,
+    "fields": {
+      "delegation": 83,
+      "date_soumission": "2026-05-27T09:56:08.079Z",
+      "valide_par_comptable": ["comptable.filiale"],
+      "date_validation_comptable": "2026-05-27T10:14:51.402Z"
+    }
+  },
+  {
+    "model": "api.justificationhebergement",
+    "pk": 15,
+    "fields": {
+      "delegation": 84,
+      "date_soumission": "2026-05-27T10:07:40.410Z",
+      "valide_par_comptable": ["comptable.filiale"],
+      "date_validation_comptable": "2026-05-27T10:15:29.072Z"
+    }
+  },
+  {
+    "model": "api.justificationhebergement",
+    "pk": 17,
+    "fields": {
+      "delegation": 87,
+      "date_soumission": "2026-05-27T12:24:26.969Z",
+      "valide_par_comptable": null,
+      "date_validation_comptable": null
+    }
+  },
+  {
+    "model": "api.justificationhebergement",
+    "pk": 18,
+    "fields": {
+      "delegation": 88,
+      "date_soumission": "2026-05-27T12:49:51.079Z",
+      "valide_par_comptable": null,
+      "date_validation_comptable": null
+    }
+  },
+  {
+    "model": "api.justificationhebergement",
+    "pk": 19,
+    "fields": {
+      "delegation": 89,
+      "date_soumission": "2026-05-27T13:34:54.403Z",
+      "valide_par_comptable": null,
+      "date_validation_comptable": null
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 4,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "866561",
+      "created_at": "2026-05-27T13:19:36.951Z",
+      "expires_at": "2026-05-27T13:24:36.950Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 5,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "782486",
+      "created_at": "2026-05-27T13:20:41.822Z",
+      "expires_at": "2026-05-27T13:25:41.822Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 6,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "172695",
+      "created_at": "2026-05-27T13:23:00.582Z",
+      "expires_at": "2026-05-27T13:28:00.582Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 7,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "027292",
+      "created_at": "2026-05-27T13:33:00.157Z",
+      "expires_at": "2026-05-27T13:38:00.157Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 8,
+    "fields": {
+      "user": ["direction.generale"],
+      "code": "949704",
+      "created_at": "2026-05-27T13:33:49.880Z",
+      "expires_at": "2026-05-27T13:38:49.880Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 9,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "786422",
+      "created_at": "2026-05-27T13:34:29.307Z",
+      "expires_at": "2026-05-27T13:39:29.307Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 10,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "607932",
+      "created_at": "2026-05-28T08:58:20.988Z",
+      "expires_at": "2026-05-28T09:03:20.987Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 11,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "046140",
+      "created_at": "2026-05-28T13:39:53.243Z",
+      "expires_at": "2026-05-28T13:44:53.243Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 12,
+    "fields": {
+      "user": ["comptable.filiale"],
+      "code": "896579",
+      "created_at": "2026-05-28T13:41:23.338Z",
+      "expires_at": "2026-05-28T13:46:23.338Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 13,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "775921",
+      "created_at": "2026-05-28T15:56:13.719Z",
+      "expires_at": "2026-05-28T16:01:13.719Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 14,
+    "fields": {
+      "user": ["admin"],
+      "code": "248120",
+      "created_at": "2026-05-28T15:57:10.873Z",
+      "expires_at": "2026-05-28T16:02:10.873Z",
+      "is_used": false
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 15,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "904259",
+      "created_at": "2026-05-28T16:09:57.668Z",
+      "expires_at": "2026-05-28T16:14:57.668Z",
+      "is_used": true
+    }
+  },
+  {
+    "model": "api.otpcode",
+    "pk": 20,
+    "fields": {
+      "user": ["ange.ziade"],
+      "code": "292727",
+      "created_at": "2026-05-28T16:43:16.559Z",
+      "expires_at": "2026-05-28T16:48:16.559Z",
+      "is_used": false
+    }
+  },
+  {
+    "model": "api.missionworkflow",
+    "pk": 57,
+    "fields": {
+      "mission": 46,
+      "workflow": 1,
+      "numero_etape": 1,
+      "libelle_etape": "Direction générale",
+      "user_validation": ["direction.generale"],
+      "statut": "APPROUVE",
+      "date_validation": "2026-05-27T10:06:31.642Z",
+      "commentaire": "RAS"
+    }
+  },
+  {
+    "model": "api.missionworkflow",
+    "pk": 59,
+    "fields": {
+      "mission": 49,
+      "workflow": 1,
+      "numero_etape": 1,
+      "libelle_etape": "Direction générale",
+      "user_validation": ["direction.generale"],
+      "statut": "APPROUVE",
+      "date_validation": "2026-05-27T12:36:59.918Z",
+      "commentaire": "RAS"
+    }
+  },
+  {
+    "model": "api.missionworkflow",
+    "pk": 60,
+    "fields": {
+      "mission": 50,
+      "workflow": 1,
+      "numero_etape": 1,
+      "libelle_etape": "Direction générale",
+      "user_validation": ["direction.generale"],
+      "statut": "APPROUVE",
+      "date_validation": "2026-05-27T12:37:32.506Z",
+      "commentaire": "RAS"
+    }
+  },
+  {
+    "model": "api.missionworkflow",
+    "pk": 61,
+    "fields": {
+      "mission": 50,
+      "workflow": null,
+      "numero_etape": 2,
+      "libelle_etape": "Ressources Humaines",
+      "user_validation": ["ressources.humaines"],
+      "statut": "APPROUVE",
+      "date_validation": "2026-05-27T12:43:52.688Z",
+      "commentaire": "RAS"
+    }
+  },
+  {
+    "model": "api.missionworkflow",
+    "pk": 62,
+    "fields": {
+      "mission": 51,
+      "workflow": 1,
+      "numero_etape": 1,
+      "libelle_etape": "Direction générale",
+      "user_validation": ["direction.generale"],
+      "statut": "APPROUVE",
+      "date_validation": "2026-05-27T13:34:14.984Z",
+      "commentaire": "RAS"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 5,
+    "fields": {
+      "action_time": "2026-05-21T10:55:25.003Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "4",
+      "object_repr": "ange.ziade",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Superuser status\", \"User permissions\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 6,
+    "fields": {
+      "action_time": "2026-05-21T16:41:31.031Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "4",
+      "object_repr": "ange.ziade",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 7,
+    "fields": {
+      "action_time": "2026-05-21T16:46:10.575Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "5",
+      "object_repr": "maliret.kouakou",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profil\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+      "action_time": "2026-05-21T16:47:14.014Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "6",
+      "object_repr": "Dimitri.yao",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profil\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+      "action_time": "2026-05-21T16:49:00.395Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "5",
+      "object_repr": "maliret.kouakou",
+      "action_flag": 2,
+      "change_message": "[]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+      "action_time": "2026-05-21T16:49:16.544Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "5",
+      "object_repr": "maliret.kouakou",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Profil\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+      "action_time": "2026-05-21T16:55:10.627Z",
+      "user": ["admin"],
+      "content_type": ["api", "user"],
+      "object_id": "4",
+      "object_repr": "ange.ziade",
+      "action_flag": 2,
+      "change_message": "[{\"changed\": {\"fields\": [\"Superuser status\", \"Profil\"]}}]"
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 12,
+    "fields": {
+      "action_time": "2026-05-27T09:48:34.534Z",
+      "user": ["admin"],
+      "content_type": ["api", "categorieemploye"],
+      "object_id": "3",
+      "object_repr": "3 - CADRE",
+      "action_flag": 1,
+      "change_message": "[{\"added\": {}}]"
+    }
+  }
+]
