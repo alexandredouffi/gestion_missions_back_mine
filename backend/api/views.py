@@ -71,6 +71,7 @@ class LoginView(APIView):
 
         from .models import OTPCode
         otp = OTPCode.generer(user)
+        print(f"Code OTP généré pour l'utilisateur {user.username}: {otp.code}")
         _envoyer_otp(user, otp.code)
 
         return Response(

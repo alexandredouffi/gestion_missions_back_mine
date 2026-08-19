@@ -172,9 +172,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email
 EMAIL_BACKEND = 'backend.email_backend.BrevoEmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_HOST = "smtp-relay.brevo.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'a8557f001@smtp-brevo.com'
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST_PASSWORD = "bskh1FCY4PlMXGe"
 DEFAULT_FROM_EMAIL = 'alexandrekdouffi@gmail.com'

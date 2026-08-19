@@ -154,11 +154,13 @@ def _envoyer(subject, texte, html, *recipients):
         _log(subject, [], 'IGNORE')
         return
     try:
+        print(f"Envoi de l'email '{subject}' à {valides}...")
         msg = EmailMultiAlternatives(subject, texte, FROM, valides)
         msg.attach_alternative(html, 'text/html')
         msg.send()
         _log(subject, valides, 'ENVOYE')
     except Exception as exc:
+        print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
         _log(subject, valides, 'ECHEC', erreur=str(exc))
 
 
