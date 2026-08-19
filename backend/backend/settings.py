@@ -31,7 +31,7 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-++x@uaqbn=260x%1y1d&=
 DEBUG = config("DEBUG", default=True, cast=bool)
 
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost,gestion-missions-back-mine.onrender.com").split(",")
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-++x@uaqbn=260x%1y1d&=fp0=8u$!&qlepf33adn8k#54wg!qa'
 
