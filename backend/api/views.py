@@ -8,6 +8,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from django.db.models import Sum
 # from django.db import connection
+from django.conf import settings
+from django.core.mail import send_mail
+from django.http import HttpResponse
 
 from .permissions import HasMissionAccess, IsSignataire, IsTresorier, IsComptable, IsAdministrateur, NOM_COMPTABLE, _est_admin
 from .notifications import (
@@ -28,6 +31,21 @@ from .serializers import RegisterSerializer, LoginSerializer, EntiteSerializer, 
     JustificationHebergementSerializer, PieceJustificativePostSerializer, \
     UserCreateSerializer, UserUpdateSerializer, AdminPasswordUpdateSerializer
 
+class TestEmail(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            send_mail(
+                "Test SMTP",
+                "Ceci est un test.",
+                settings.DEFAULT_FROM_EMAIL,
+                ["angejoelziade@gmail.com", "alexandrekdouffi@gmail.com"],
+                fail_silently=False,
+            )
+            return HttpResponse("OK")
+        except Exception as e:
+            return HttpResponse(f"ERREUR: {e}", status=500)
 
 class RegisterView(APIView):
     permission_classes = [IsAuthenticated]

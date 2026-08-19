@@ -9,10 +9,11 @@ from .views import RegisterView, LoginView, EntiteView, EntiteDetailView, UserVi
     EntiteAllList, UserAllView, DirectionAllView, UserDetailView, \
     JustificationHebergementView, PieceJustificativeView, UtilisateurBlocageView, AdminPasswordUpdateView, \
     MissionAPayerView, DelegationsMissionsASignerView, UserStatutView, \
-    MissionsJustifieesComptableView, ValidationComptableView, VerifyOTPView
+    MissionsJustifieesComptableView, ValidationComptableView, VerifyOTPView,TestEmail
 
 urlpatterns = [
     path('inscription/', RegisterView.as_view(), name='inscription'),
+    path('test-email/', TestEmail.as_view(), name='test-email'),
     path('authentification/', LoginView.as_view(), name='authentification'),
     path('authentification/verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
     path('utilisateur/', UserView.as_view(), name='utilisateur-detail'),
