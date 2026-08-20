@@ -171,7 +171,7 @@ def _envoyer_async(subject, texte, html, *recipients):
                 text_content=texte or "",
                 html_content=html or "",
                 sender=SendTransacEmailRequestSender(
-                    name="GESAM",
+                    name="GEMA",
                     email=settings.BREVO_SENDER_EMAIL,
                 ),
                 to=[
