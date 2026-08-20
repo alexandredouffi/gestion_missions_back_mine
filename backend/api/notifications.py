@@ -1,8 +1,15 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from concurrent.futures import ThreadPoolExecutor
-
+from brevo import Brevo
+from brevo.transactional_emails import (
+    SendTransacEmailRequestSender,
+    SendTransacEmailRequestToItem,
+)
 executor = ThreadPoolExecutor(max_workers=4)
+
+
+client = Brevo(api_key=settings.BREVO_API_KEY)
 
 FROM = settings.DEFAULT_FROM_EMAIL
 
@@ -153,19 +160,30 @@ def _info_block(libelle, valeur):
 def _envoyer_async(subject, texte, html, *recipients):
     valides = [e for e in recipients if e]
     if not valides:
-        _log(subject, [], 'IGNORE')
+        _log(subject, [], "IGNORE")
         return
 
     def _send():
         try:
             print(f"Envoi de l'email '{subject}' à {valides}...")
-            msg = EmailMultiAlternatives(subject, texte, FROM, valides)
-            msg.attach_alternative(html, 'text/html')
-            msg.send(fail_silently=False)
-            _log(subject, valides, 'ENVOYE')
+            result = client.transactional_emails.send_transac_email(
+                subject=subject,
+                text_content=texte or "",
+                html_content=html or "",
+                sender=SendTransacEmailRequestSender(
+                    name="GESAM",
+                    email=settings.BREVO_SENDER_EMAIL,
+                ),
+                to=[
+                    SendTransacEmailRequestToItem(email=email)
+                    for email in valides
+                ],
+            )
+            print(f"Email '{subject}' envoyé à {valides}. Message ID : {getattr(result, 'message_id', None)}")
+            _log(subject, valides, "ENVOYE", message_id=getattr(result, "message_id", None))
         except Exception as exc:
             print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
-            _log(subject, valides, 'ECHEC', erreur=str(exc))
+            _log(subject, valides, "ECHEC", erreur=str(exc))
 
     executor.submit(_send)
 
