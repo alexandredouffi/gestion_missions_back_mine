@@ -30,22 +30,47 @@ from .serializers import RegisterSerializer, LoginSerializer, EntiteSerializer, 
     DelegationGetSerializer, DelegationPostSerializer, PaiementGetSerializer, PaiementPostSerializer, \
     JustificationHebergementSerializer, PieceJustificativePostSerializer, \
     UserCreateSerializer, UserUpdateSerializer, AdminPasswordUpdateSerializer
+from brevo import Brevo
+import os
+from brevo.transactional_emails import (
+    SendTransacEmailRequestSender,
+    SendTransacEmailRequestToItem,
+)
+
+client = Brevo(api_key=settings.BREVO_API_KEY)
+
+def send_test_email():
+    result = client.transactional_emails.send_transac_email(
+        subject="Test Brevo API",
+        html_content="<p>Ceci est un test.</p>",
+        sender=SendTransacEmailRequestSender(
+            name="Mon App",
+            email=settings.BREVO_SENDER_EMAIL,
+        ),
+        to=[
+            SendTransacEmailRequestToItem(email="angejoelziade@gmail.com"),
+            SendTransacEmailRequestToItem(email="alexandrekdouffi@gmail.com"),
+        ],
+    )
+    return result
 
 class TestEmail(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         try:
-            send_mail(
-                "Test SMTP",
-                "Ceci est un test.",
-                settings.DEFAULT_FROM_EMAIL,
-                ["angejoelziade@gmail.com", "alexandrekdouffi@gmail.com"],
-                fail_silently=False,
-            )
-            return HttpResponse("OK")
+            result= send_test_email()
+            # send_mail(
+            #     "Test SMTP",
+            #     "Ceci est un test.",
+            #     settings.DEFAULT_FROM_EMAIL,
+            #     ["angejoelziade@gmail.com", "alexandrekdouffi@gmail.com"],
+            #     fail_silently=False,
+            # )
+            # return HttpResponse("OK")
+            return Response({"message": "Email envoyé avec succès", "result": result}, status=status.HTTP_200_OK)
         except Exception as e:
-            return HttpResponse(f"ERREUR: {e}", status=500)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RegisterView(APIView):
     permission_classes = [IsAuthenticated]
