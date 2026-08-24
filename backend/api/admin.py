@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     User, Entite, Profil, CategorieEmploye, Destination, Bareme, Direction,
-    Mission, Workflow, MissionWorkflow
+    Mission, Workflow, MissionWorkflow, PasswordSetupToken
 )
 
 admin.site.register(User)
@@ -33,3 +33,11 @@ class MissionWorkflowAdmin(admin.ModelAdmin):
     list_display = ('mission', 'workflow', 'user_validation', 'statut', 'date_validation')
     list_filter = ('statut', 'mission')
     search_fields = ('mission__numero_mission', 'user_validation__username')
+
+
+@admin.register(PasswordSetupToken)
+class PasswordSetupTokenAdmin(admin.ModelAdmin):
+    list_display = ('user', 'motif', 'created_at', 'expires_at', 'is_used', 'used_at')
+    list_filter = ('motif', 'is_used')
+    search_fields = ('user__username', 'user__matricule')
+    readonly_fields = ('token', 'created_at', 'used_at')

@@ -8,20 +8,20 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from django.db.models import Sum
 # from django.db import connection
-from django.conf import settings
-from django.core.mail import send_mail
-from django.http import HttpResponse
 
 from .permissions import HasMissionAccess, IsSignataire, IsTresorier, IsComptable, IsAdministrateur, NOM_COMPTABLE, _est_admin
 from .notifications import (
     notifier_creation_mission, notifier_ajout_delegation,
+    notifier_retrait_delegation, collecter_contexte_retrait_delegation,
     notifier_traitement_mission, notifier_paiement,
-    notifier_justification_complete, notifier_validation_comptable,
-    _envoyer_otp,
+    notifier_justification_complete, notifier_validation_comptable, notifier_piece_retiree,
+    notifier_lien_mot_de_passe,
+    _envoyer_otp, _email,
 )
 
 from .models import Entite, User, Profil, CategorieEmploye, Destination, Bareme, Direction, Workflow, \
-    Mission, MissionWorkflow, Delegation, Paiement, JustificationHebergement, PieceJustificative, NotificationLog
+    Mission, MissionWorkflow, Delegation, Paiement, JustificationHebergement, PieceJustificative, NotificationLog, \
+    PasswordSetupToken
 from .serializers import RegisterSerializer, LoginSerializer, EntiteSerializer, UserSerializer, ProfilSerializer, \
     CategorieEmployeSerializer, DestinationSerializer, BaremeGetSerializer, BaremePostSerializer, \
     DirectionPostSerializer, DirectionGetSerializer, WorkflowGetSerializer, WorkflowPostSerializer, \
@@ -29,48 +29,16 @@ from .serializers import RegisterSerializer, LoginSerializer, EntiteSerializer, 
     MissionGetWorkflowSerializer, MissionPostWorkflowSerializer, TraiterMissionSerializer, \
     DelegationGetSerializer, DelegationPostSerializer, PaiementGetSerializer, PaiementPostSerializer, \
     JustificationHebergementSerializer, PieceJustificativePostSerializer, \
-    UserCreateSerializer, UserUpdateSerializer, AdminPasswordUpdateSerializer
-from brevo import Brevo
-import os
-from brevo.transactional_emails import (
-    SendTransacEmailRequestSender,
-    SendTransacEmailRequestToItem,
-)
+    UserCreateSerializer, UserUpdateSerializer, AdminPasswordUpdateSerializer, DefinirMotDePasseSerializer
 
-client = Brevo(api_key=settings.BREVO_API_KEY)
 
-def send_test_email():
-    result = client.transactional_emails.send_transac_email(
-        subject="Test Brevo API",
-        html_content="<p>Ceci est un test.</p>",
-        sender=SendTransacEmailRequestSender(
-            name="Mon App",
-            email=settings.BREVO_SENDER_EMAIL,
-        ),
-        to=[
-            SendTransacEmailRequestToItem(email="angejoelziade@gmail.com"),
-            SendTransacEmailRequestToItem(email="alexandrekdouffi@gmail.com"),
-        ],
-    )
-    return result
+def envoyer_lien_mot_de_passe(user, motif='CREATION'):
+    """Génère un lien à usage unique et l'envoie par email. Retourne le token créé."""
+    jeton = PasswordSetupToken.generer(user, motif=motif)
+    duree = int((jeton.expires_at - jeton.created_at).total_seconds() // 3600)
+    notifier_lien_mot_de_passe(user, jeton.construire_url(), duree, motif=motif)
+    return jeton
 
-class TestEmail(APIView):
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        try:
-            result= send_test_email()
-            # send_mail(
-            #     "Test SMTP",
-            #     "Ceci est un test.",
-            #     settings.DEFAULT_FROM_EMAIL,
-            #     ["angejoelziade@gmail.com", "alexandrekdouffi@gmail.com"],
-            #     fail_silently=False,
-            # )
-            # return HttpResponse("OK")
-            return Response({"message": "Email envoyé avec succès", "result": result}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class RegisterView(APIView):
     permission_classes = [IsAuthenticated]
@@ -79,8 +47,20 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            response = dict(message="Utilisateur créé avec success")
-            return Response(response, status=status.HTTP_201_CREATED)
+            lien_envoye = False
+            if not user.has_usable_password():
+                envoyer_lien_mot_de_passe(user, motif='CREATION')
+                lien_envoye = True
+            return Response(
+                {
+                    "message": (
+                        "Utilisateur créé. Un lien de définition du mot de passe lui a été envoyé par email."
+                        if lien_envoye else "Utilisateur créé avec success"
+                    ),
+                    "lien_mot_de_passe_envoye": lien_envoye,
+                },
+                status=status.HTTP_201_CREATED
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -102,6 +82,15 @@ class LoginView(APIView):
                     {"message": "Ce compte est désactivé. Contactez un administrateur."},
                     status=status.HTTP_403_FORBIDDEN
                 )
+            if not raw_user.has_usable_password():
+                return Response(
+                    {
+                        "message": "Votre mot de passe n'a pas encore été défini. "
+                                   "Consultez le lien d'activation envoyé à votre adresse email.",
+                        "mot_de_passe_a_definir": True,
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
         except User.DoesNotExist:
             pass
 
@@ -114,7 +103,6 @@ class LoginView(APIView):
 
         from .models import OTPCode
         otp = OTPCode.generer(user)
-        print(f"Code OTP généré pour l'utilisateur {user.username}: {otp.code}")
         _envoyer_otp(user, otp.code)
 
         return Response(
@@ -185,6 +173,102 @@ class VerifyOTPView(APIView):
         )
 
 
+class DefinirMotDePasseView(APIView):
+    """Consultation et consommation d'un lien de définition de mot de passe."""
+    permission_classes = [AllowAny]
+
+    def _recuperer(self, token):
+        try:
+            return PasswordSetupToken.objects.select_related('user').get(token=token)
+        except PasswordSetupToken.DoesNotExist:
+            return None
+
+    def get(self, request, token):
+        jeton = self._recuperer(token)
+        if jeton is None:
+            return Response(
+                {"message": "Lien invalide.", "valide": False},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        if not jeton.est_valide:
+            motif = "déjà utilisé" if jeton.is_used else "expiré"
+            return Response(
+                {"message": f"Ce lien est {motif}. Demandez-en un nouveau à un administrateur.",
+                 "valide": False},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if not jeton.user.is_active:
+            return Response(
+                {"message": "Ce compte est désactivé. Contactez un administrateur.", "valide": False},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return Response(
+            {
+                "valide": True,
+                "username": jeton.user.username,
+                "nom_complet": f"{jeton.user.last_name} {jeton.user.first_name}".strip(),
+                "expire_le": jeton.expires_at,
+            },
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request, token):
+        jeton = self._recuperer(token)
+        if jeton is None:
+            return Response({"message": "Lien invalide."}, status=status.HTTP_404_NOT_FOUND)
+        if not jeton.est_valide:
+            motif = "déjà utilisé" if jeton.is_used else "expiré"
+            return Response(
+                {"message": f"Ce lien est {motif}. Demandez-en un nouveau à un administrateur."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if not jeton.user.is_active:
+            return Response(
+                {"message": "Ce compte est désactivé. Contactez un administrateur."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = DefinirMotDePasseSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = jeton.user
+        user.set_password(serializer.validated_data['password'])
+        user.save(update_fields=['password'])
+        jeton.marquer_utilise()
+
+        return Response(
+            {"message": "Mot de passe défini avec succès. Vous pouvez maintenant vous connecter.",
+             "username": user.username},
+            status=status.HTTP_200_OK
+        )
+
+
+class RenvoyerLienMotDePasseView(APIView):
+    """Renvoi par un administrateur du lien de définition de mot de passe."""
+    permission_classes = [IsAdministrateur]
+
+    def post(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        if not user.is_active:
+            return Response(
+                {"message": "Ce compte est désactivé. Réactivez-le avant d'envoyer un lien."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if not _email(user):
+            return Response(
+                {"message": "Cet utilisateur n'a pas d'adresse email valide."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        motif = 'CREATION' if not user.has_usable_password() else 'REINITIALISATION'
+        jeton = envoyer_lien_mot_de_passe(user, motif=motif)
+        return Response(
+            {"message": "Lien envoyé par email.", "expire_le": jeton.expires_at},
+            status=status.HTTP_200_OK
+        )
+
+
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -196,10 +280,19 @@ class UserView(APIView):
     def post(self, request):
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            user = serializer.save()
+            lien_envoye = False
+            if not user.has_usable_password():
+                envoyer_lien_mot_de_passe(user, motif='CREATION')
+                lien_envoye = True
             return Response(
                 {
-                    "message": "Utilisateur créé avec succès",
+                    "message": (
+                        "Utilisateur créé avec succès. Un lien de définition du mot de passe "
+                        "lui a été envoyé par email."
+                        if lien_envoye else "Utilisateur créé avec succès"
+                    ),
+                    "lien_mot_de_passe_envoye": lien_envoye,
                     "data": serializer.data
                 },
                 status=status.HTTP_201_CREATED
@@ -1081,7 +1174,11 @@ class DelegationDetailView(APIView):
 
     def delete(self, request, pk):
         delegation = get_object_or_404(Delegation, pk=pk)
+        contexte = collecter_contexte_retrait_delegation(delegation)
+
         delegation.delete()
+        notifier_retrait_delegation(contexte, request.user)
+
         return Response(
             {"message": "Membre retiré de la délégation"},
             status=status.HTTP_204_NO_CONTENT
@@ -1275,7 +1372,14 @@ class PieceJustificativeView(APIView):
 
     def delete(self, request, pk):
         piece = get_object_or_404(PieceJustificative, pk=pk)
+        justification = piece.justification
+        etait_complete = justification.est_complet
+        libelle, montant = piece.libelle, piece.montant
+
         piece.delete()
+        justification.refresh_from_db()
+        notifier_piece_retiree(justification, libelle, montant, request.user, etait_complete)
+
         return Response(
             {"message": "Pièce supprimée"},
             status=status.HTTP_204_NO_CONTENT

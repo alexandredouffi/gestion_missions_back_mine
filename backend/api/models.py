@@ -4,13 +4,14 @@ from django.utils import timezone
 from datetime import date, timedelta
 import uuid
 import random
+import secrets
 
 
 class User(AbstractUser):
     matricule = models.CharField(max_length=20, null=False, blank=False, unique=True, default='Inconnu')
     fonction = models.CharField(max_length=100, null=False, blank=False, unique=False, default='Inconnu')
     date_naissance = models.DateField(null=False, blank=False, unique=False, default='1900-01-01')
-    telephone = models.CharField(max_length=20, null=False, blank=False, unique=True, default='Inconnu')
+    telephone = models.CharField(max_length=20, null=True, blank=True)
     email_reciever = models.EmailField(null=True, blank=True, default='Inconnu')
     filiale = models.ForeignKey('Entite', on_delete=models.CASCADE, null=True, blank=True)
     profil = models.ForeignKey('Profil', on_delete=models.CASCADE, null=True, blank=True)
@@ -314,6 +315,62 @@ class PieceJustificative(models.Model):
 
     def __str__(self):
         return f"{self.libelle} — {self.montant} F"
+
+
+class PasswordSetupToken(models.Model):
+    """Lien à usage unique permettant à un utilisateur de définir son mot de passe."""
+
+    MOTIFS = [
+        ('CREATION', 'Création de compte'),
+        ('REINITIALISATION', 'Réinitialisation'),
+    ]
+
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='password_setup_tokens')
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    motif = models.CharField(max_length=20, choices=MOTIFS, default='CREATION')
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Lien de définition de mot de passe"
+        verbose_name_plural = "Liens de définition de mot de passe"
+        ordering = ['-created_at']
+
+    @classmethod
+    def generer(cls, user, motif='CREATION', duree_heures=None):
+        """Invalide les liens en cours de l'utilisateur et en crée un nouveau."""
+        from django.conf import settings as dj_settings
+
+        cls.objects.filter(user=user, is_used=False).delete()
+        heures = duree_heures or getattr(dj_settings, 'PASSWORD_SETUP_TOKEN_HOURS', 48)
+        return cls.objects.create(
+            user=user,
+            token=secrets.token_urlsafe(48),
+            motif=motif,
+            expires_at=timezone.now() + timedelta(hours=heures),
+        )
+
+    @property
+    def est_valide(self):
+        return not self.is_used and timezone.now() <= self.expires_at
+
+    def construire_url(self):
+        from django.conf import settings as dj_settings
+
+        base = getattr(dj_settings, 'FRONTEND_URL', '').rstrip('/')
+        chemin = getattr(dj_settings, 'PASSWORD_SETUP_PATH', '/definir-mot-de-passe').strip('/')
+        return f"{base}/{chemin}/{self.token}"
+
+    def marquer_utilise(self):
+        self.is_used = True
+        self.used_at = timezone.now()
+        self.save(update_fields=['is_used', 'used_at'])
+
+    def __str__(self):
+        etat = 'valide' if self.est_valide else 'expiré/utilisé'
+        return f"Lien mot de passe {self.user.username} — {etat}"
 
 
 class OTPCode(models.Model):

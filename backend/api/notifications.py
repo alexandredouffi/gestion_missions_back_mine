@@ -1,15 +1,5 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-from concurrent.futures import ThreadPoolExecutor
-from brevo import Brevo
-from brevo.transactional_emails import (
-    SendTransacEmailRequestSender,
-    SendTransacEmailRequestToItem,
-)
-executor = ThreadPoolExecutor(max_workers=4)
-
-
-client = Brevo(api_key=settings.BREVO_API_KEY)
 
 FROM = settings.DEFAULT_FROM_EMAIL
 
@@ -48,7 +38,7 @@ def _nom(user):
 
 # ── Template HTML de base ───────────────────────────────────────────────────
 
-def _html(titre, couleur_titre, lignes_html, badge=None, badge_couleur=None, cta_label=None):
+def _html(titre, couleur_titre, lignes_html, badge=None, badge_couleur=None, cta_label=None, cta_url=None):
     """
     Génère un email HTML complet.
     lignes_html : liste de chaînes HTML insérées dans le corps.
@@ -70,9 +60,10 @@ def _html(titre, couleur_titre, lignes_html, badge=None, badge_couleur=None, cta
 
     cta_html = ''
     if cta_label:
+        href = cta_url or '#'
         cta_html = f'''
         <div style="text-align:center;margin:28px 0 0 0;">
-          <a href="#" style="display:inline-block;background:{COLOR_ACCENT};color:#fff;
+          <a href="{href}" style="display:inline-block;background:{COLOR_ACCENT};color:#fff;
                              padding:12px 32px;border-radius:6px;font-size:15px;
                              font-weight:600;text-decoration:none;">{cta_label}</a>
         </div>'''
@@ -157,52 +148,98 @@ def _info_block(libelle, valeur):
         f'</tr></table>'
     )
 
-def _envoyer_async(subject, texte, html, *recipients):
-    valides = [e for e in recipients if e]
-    if not valides:
-        _log(subject, [], "IGNORE")
-        return
-
-    def _send():
-        try:
-            print(f"Envoi de l'email '{subject}' à {valides}...")
-            result = client.transactional_emails.send_transac_email(
-                subject=subject,
-                text_content=texte or "",
-                html_content=html or "",
-                sender=SendTransacEmailRequestSender(
-                    name="GEMA",
-                    email=settings.BREVO_SENDER_EMAIL,
-                ),
-                to=[
-                    SendTransacEmailRequestToItem(email=email)
-                    for email in valides
-                ],
-            )
-            print(f"Email '{subject}' envoyé à {valides}. Message ID : {getattr(result, 'message_id', None)}")
-            _log(subject, valides, "ENVOYE", message_id=getattr(result, "message_id", None))
-        except Exception as exc:
-            print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
-            _log(subject, valides, "ECHEC", erreur=str(exc))
-
-    executor.submit(_send)
-
 
 def _envoyer(subject, texte, html, *recipients):
-    _envoyer_async(subject, texte, html, *recipients)
-    # valides = [e for e in recipients if e]
-    # if not valides:
-    #     _log(subject, [], 'IGNORE')
-    #     return
-    # try:
-    #     print(f"Envoi de l'email '{subject}' à {valides}...")
-    #     msg = EmailMultiAlternatives(subject, texte, FROM, valides)
-    #     msg.attach_alternative(html, 'text/html')
-    #     msg.send()
-    #     _log(subject, valides, 'ENVOYE')
-    # except Exception as exc:
-    #     print(f"Erreur lors de l'envoi de l'email '{subject}' à {valides} : {exc}")
-    #     _log(subject, valides, 'ECHEC', erreur=str(exc))
+    valides = [e for e in recipients if e]
+    if not valides:
+        _log(subject, [], 'IGNORE')
+        return
+    try:
+        msg = EmailMultiAlternatives(subject, texte, FROM, valides)
+        msg.attach_alternative(html, 'text/html')
+        msg.send()
+        _log(subject, valides, 'ENVOYE')
+    except Exception as exc:
+        _log(subject, valides, 'ECHEC', erreur=str(exc))
+
+
+# ── 0 bis. Définition du mot de passe ───────────────────────────────────────
+
+def notifier_lien_mot_de_passe(user, url, duree_heures, motif='CREATION'):
+    """Envoie le lien à usage unique permettant de définir son mot de passe."""
+    creation = motif == 'CREATION'
+
+    sujet = (
+        "[Gestion Missions] Activez votre compte"
+        if creation else
+        "[Gestion Missions] Réinitialisation de votre mot de passe"
+    )
+
+    intro = (
+        "Un compte vient d'être créé pour vous sur Gestion Missions."
+        if creation else
+        "Une réinitialisation de votre mot de passe a été demandée."
+    )
+
+    texte = (
+        f"Bonjour {_nom(user)},\n\n"
+        f"{intro}\n\n"
+        f"Définissez votre mot de passe en ouvrant le lien ci-dessous :\n{url}\n\n"
+        f"Identifiant : {user.username}\n"
+        f"Ce lien est valable {duree_heures} heures et ne peut être utilisé qu'une seule fois.\n\n"
+        f"Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\n"
+        f"Cordialement,\nGestion Missions"
+    )
+
+    bloc_bouton = (
+        f'<div style="text-align:center;margin:28px 0;">'
+        f'<a href="{url}" style="display:inline-block;background:{COLOR_ACCENT};color:#fff;'
+        f'padding:14px 36px;border-radius:6px;font-size:15px;font-weight:600;'
+        f'text-decoration:none;">Définir mon mot de passe</a></div>'
+    )
+
+    bloc_lien = (
+        f'<div style="background:{COLOR_LIGHT};border-radius:6px;padding:14px 16px;margin:20px 0;">'
+        f'<p style="margin:0 0 6px 0;font-size:12px;color:{COLOR_MUTED};font-weight:600;">'
+        f'Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>'
+        f'<p style="margin:0;font-size:12px;word-break:break-all;">'
+        f'<a href="{url}" style="color:{COLOR_ACCENT};text-decoration:none;">{url}</a></p>'
+        f'</div>'
+    )
+
+    bloc_expiration = (
+        f'<div style="text-align:center;margin:20px 0 0;">'
+        f'<span style="display:inline-block;background:#FFF3CD;border:1px solid #FFEAA7;'
+        f'border-radius:20px;padding:8px 20px;font-size:13px;font-weight:600;color:#856404;">'
+        f'⏱&nbsp; Ce lien expire dans <strong>{duree_heures} heures</strong></span></div>'
+    )
+
+    bloc_securite = (
+        f'<div style="background:{COLOR_LIGHT};border-left:3px solid {COLOR_MUTED};'
+        f'border-radius:4px;padding:12px 16px;margin-top:20px;">'
+        f'<p style="margin:0;font-size:12px;color:{COLOR_MUTED};">'
+        f'🔒 <strong>Sécurité :</strong> ce lien est personnel et à usage unique. '
+        f"Ne le transmettez à personne. Gestion Missions ne vous demandera jamais "
+        f"votre mot de passe par email.</p>"
+        f'</div>'
+    )
+
+    html = _html(
+        titre="Définissez votre mot de passe",
+        couleur_titre=COLOR_PRIMARY,
+        badge="ACTIVATION DU COMPTE" if creation else "RÉINITIALISATION",
+        badge_couleur=COLOR_ACCENT if creation else COLOR_WARNING,
+        lignes_html=[
+            f"Bonjour <strong>{_nom(user)}</strong>,",
+            intro + " Pour y accéder, vous devez d'abord choisir votre mot de passe.",
+            _info_block("Identifiant de connexion", user.username),
+            bloc_bouton,
+            bloc_lien,
+            bloc_expiration,
+            bloc_securite,
+        ],
+    )
+    _envoyer(sujet, texte, html, _email(user))
 
 
 # ── 0. OTP ──────────────────────────────────────────────────────────────────
@@ -360,6 +397,178 @@ def notifier_ajout_delegation(delegation):
         cta_label="Voir les détails",
     )
     _envoyer(sujet, texte, html, _email(employe))
+
+
+def collecter_contexte_retrait_delegation(delegation):
+    """
+    À appeler AVANT la suppression d'une délégation : capture les données qui
+    vont disparaître, y compris ce que la cascade va effacer (paiement,
+    justification d'hébergement et ses pièces).
+    """
+    contexte = {
+        'mission': delegation.mission,
+        'employe': delegation.employe,
+        'montant_total': delegation.montant_total,
+        'etait_chef': delegation.est_chef,
+        'paiement': None,
+        'justification': None,
+    }
+
+    paiement = getattr(delegation, 'paiement', None)
+    if paiement is not None:
+        contexte['paiement'] = {
+            'mode': paiement.get_mode_display(),
+            'montant': paiement.montant,
+            'reference': paiement.reference_cheque,
+            'effectue': paiement.effectue,
+            'enregistre_par': paiement.enregistre_par,
+        }
+
+    justification = getattr(delegation, 'justification_hebergement', None)
+    if justification is not None:
+        contexte['justification'] = {
+            'montant': justification.montant_total_justifie,
+            'nb_pieces': justification.pieces.count(),
+            'validee_par': justification.valide_par_comptable,
+        }
+
+    return contexte
+
+
+def notifier_retrait_delegation(contexte, auteur):
+    """Notifie le retrait d'un membre de délégation. `contexte` vient de
+    collecter_contexte_retrait_delegation(), appelée avant la suppression."""
+    mission = contexte['mission']
+    employe = contexte['employe']
+    paiement = contexte['paiement']
+    justification = contexte['justification']
+    numero = mission.numero_mission
+
+    # La suppression d'un paiement est le cas le plus grave.
+    if paiement:
+        badge, badge_couleur, couleur = "PAIEMENT SUPPRIMÉ", COLOR_DANGER, COLOR_DANGER
+    elif justification or contexte['etait_chef']:
+        badge, badge_couleur, couleur = "MEMBRE RETIRÉ", COLOR_WARNING, COLOR_WARNING
+    else:
+        badge, badge_couleur, couleur = "MEMBRE RETIRÉ", COLOR_MUTED, COLOR_PRIMARY
+
+    alertes_html, alertes_texte = [], []
+
+    if contexte['etait_chef']:
+        alertes_html.append(
+            f'<div style="background:#FFF3CD;border-left:3px solid {COLOR_WARNING};'
+            f'border-radius:4px;padding:12px 16px;margin:16px 0;">'
+            f'<p style="margin:0;font-size:13px;color:#856404;">'
+            f'⚠️ Ce membre était <strong>chef de délégation</strong>. '
+            f'La mission n\'a plus de chef désigné.</p></div>'
+        )
+        alertes_texte.append("ATTENTION : ce membre était chef de délégation. "
+                             "La mission n'a plus de chef désigné.")
+
+    if paiement:
+        details = f"{paiement['mode']} — {paiement['montant']:,.0f} F CFA"
+        if paiement['reference']:
+            details += f" (réf. {paiement['reference']})"
+        etat = "déjà effectué" if paiement['effectue'] else "non encore effectué"
+        alertes_html.append(
+            f'<div style="background:#FDEDEC;border-left:3px solid {COLOR_DANGER};'
+            f'border-radius:4px;padding:12px 16px;margin:16px 0;">'
+            f'<p style="margin:0;font-size:13px;color:{COLOR_DANGER};">'
+            f'⚠️ <strong>Un paiement enregistré a été supprimé</strong> avec ce membre : '
+            f'{details}, {etat}.</p></div>'
+        )
+        alertes_texte.append(f"ATTENTION : un paiement enregistré a été supprimé "
+                             f"avec ce membre : {details}, {etat}.")
+
+    if justification:
+        detail_valid = ""
+        if justification['validee_par']:
+            detail_valid = f", validée par {_nom(justification['validee_par'])}"
+        alertes_html.append(
+            f'<div style="background:#FDEDEC;border-left:3px solid {COLOR_DANGER};'
+            f'border-radius:4px;padding:12px 16px;margin:16px 0;">'
+            f'<p style="margin:0;font-size:13px;color:{COLOR_DANGER};">'
+            f'⚠️ <strong>La justification d\'hébergement a été supprimée</strong> : '
+            f'{justification["nb_pieces"]} pièce(s) pour '
+            f'{justification["montant"]:,.0f} F CFA{detail_valid}.</p></div>'
+        )
+        alertes_texte.append(
+            f"ATTENTION : la justification d'hébergement a été supprimée : "
+            f"{justification['nb_pieces']} pièce(s) pour "
+            f"{justification['montant']:,.0f} F CFA{detail_valid}.")
+
+    def _lignes(destinataire, intro):
+        return [
+            f"Bonjour <strong>{_nom(destinataire)}</strong>,",
+            intro,
+            _info_block("Référence", numero),
+            _info_block("Objet", mission.objet_mission),
+            _info_block("Période", f"Du {mission.date_depart} au {mission.date_retour}"),
+            _info_block("Lieu", mission.lieu_mission),
+            _info_block("Membre retiré", _nom(employe)),
+            _info_block("Retiré par", _nom(auteur)),
+            _info_block("Indemnités annulées", f"{contexte['montant_total']:,.0f} F CFA"),
+            *alertes_html,
+        ]
+
+    texte_commun = (
+        f"Mission : {numero} — {mission.objet_mission}\n"
+        f"Période : du {mission.date_depart} au {mission.date_retour}\n"
+        f"Membre retiré : {_nom(employe)}\n"
+        f"Retiré par : {_nom(auteur)}\n"
+        f"Indemnités annulées : {contexte['montant_total']:,.0f} F CFA\n"
+        + ''.join(f"{a}\n" for a in alertes_texte)
+    )
+
+    destinataires = []
+
+    # 1. Le membre retiré
+    if employe.pk != auteur.pk:
+        destinataires.append((
+            employe,
+            f"[Gestion Missions] Vous avez été retiré de la mission {numero}",
+            "Vous avez été retiré(e) de la délégation de la mission suivante.",
+            "Vous avez été retiré(e) de la délégation de la mission suivante.",
+            "Retrait de la délégation",
+        ))
+
+    # 2. Le demandeur de la mission
+    demandeur = mission.demandeur
+    if demandeur.pk not in (auteur.pk, employe.pk):
+        destinataires.append((
+            demandeur,
+            f"[Gestion Missions] Membre retiré de la délégation — {numero}",
+            f"<strong>{_nom(employe)}</strong> a été retiré(e) de la délégation de votre mission.",
+            f"{_nom(employe)} a été retiré(e) de la délégation de votre mission.",
+            "Membre retiré de la délégation",
+        ))
+
+    # 3. Le trésorier qui avait enregistré le paiement supprimé
+    if paiement and paiement['enregistre_par']:
+        tresorier = paiement['enregistre_par']
+        if tresorier.pk not in (auteur.pk, employe.pk, demandeur.pk):
+            destinataires.append((
+                tresorier,
+                f"[Gestion Missions] Paiement supprimé suite à un retrait de délégation — {numero}",
+                f"Le paiement que vous avez enregistré pour <strong>{_nom(employe)}</strong> "
+                f"a été supprimé : ce membre a été retiré de la délégation.",
+                f"Le paiement que vous avez enregistré pour {_nom(employe)} a été supprimé : "
+                f"ce membre a été retiré de la délégation.",
+                "Paiement supprimé",
+            ))
+
+    for destinataire, sujet, intro_html, intro_texte, titre in destinataires:
+        texte = (
+            f"Bonjour {_nom(destinataire)},\n\n{intro_texte}\n\n"
+            f"{texte_commun}\nCordialement,\nGestion Missions"
+        )
+        html = _html(
+            titre=titre,
+            couleur_titre=couleur,
+            badge=badge, badge_couleur=badge_couleur,
+            lignes_html=_lignes(destinataire, intro_html),
+        )
+        _envoyer(sujet, texte, html, _email(destinataire))
 
 
 # ── 3. Traitement d'une étape workflow ──────────────────────────────────────
@@ -609,6 +818,120 @@ def notifier_justification_complete(justification):
             cta_label="Valider la justification",
         )
         _envoyer(sujet, texte, html, _email(comptable))
+
+
+def notifier_piece_retiree(justification, libelle, montant, auteur, etait_complete):
+    """Alerte le comptable (et l'employé) qu'une pièce justificative a été retirée."""
+    from .models import User
+
+    delegation = justification.delegation
+    mission = delegation.mission
+    employe = delegation.employe
+    numero = mission.numero_mission
+
+    total = justification.montant_total_justifie
+    attendu = delegation.montant_hebergement
+    reste = attendu - total
+    deja_validee = justification.valide_par_comptable is not None
+
+    if deja_validee:
+        badge, badge_couleur, couleur = "RETRAIT APRÈS VALIDATION", COLOR_DANGER, COLOR_DANGER
+    elif etait_complete:
+        badge, badge_couleur, couleur = "JUSTIFICATION INCOMPLÈTE", COLOR_WARNING, COLOR_WARNING
+    else:
+        badge, badge_couleur, couleur = "PIÈCE RETIRÉE", COLOR_MUTED, COLOR_PRIMARY
+
+    alerte = ''
+    if deja_validee:
+        alerte = (
+            f'<div style="background:#FDEDEC;border-left:3px solid {COLOR_DANGER};'
+            f'border-radius:4px;padding:12px 16px;margin:16px 0;">'
+            f'<p style="margin:0;font-size:13px;color:{COLOR_DANGER};">'
+            f'⚠️ <strong>Attention :</strong> cette justification avait déjà été validée par '
+            f'{_nom(justification.valide_par_comptable)}. Le montant justifié ne couvre '
+            f'plus nécessairement le montant dû.</p></div>'
+        )
+    elif etait_complete:
+        alerte = (
+            f'<div style="background:#FFF3CD;border-left:3px solid {COLOR_WARNING};'
+            f'border-radius:4px;padding:12px 16px;margin:16px 0;">'
+            f'<p style="margin:0;font-size:13px;color:#856404;">'
+            f'⚠️ La justification était complète : elle ne l\'est plus et ne peut plus '
+            f'être validée en l\'état.</p></div>'
+        )
+
+    def _lignes(destinataire, intro):
+        lignes = [
+            f"Bonjour <strong>{_nom(destinataire)}</strong>,",
+            intro,
+            _info_block("Mission", f"{numero} — {mission.objet_mission}"),
+            _info_block("Bénéficiaire", _nom(employe)),
+            _info_block("Pièce retirée", f"{libelle} — {montant:,.0f} F CFA"),
+            _info_block("Retirée par", _nom(auteur)),
+            _info_block("Montant justifié restant", f"{total:,.0f} F CFA"),
+            _info_block("Montant attendu", f"{attendu:,.0f} F CFA"),
+        ]
+        if reste > 0:
+            lignes.append(_info_block(
+                "Reste à justifier",
+                f"<strong style='color:{COLOR_DANGER};'>{reste:,.0f} F CFA</strong>"))
+        if alerte:
+            lignes.append(alerte)
+        return lignes
+
+    texte_commun = (
+        f"Pièce retirée : {libelle} — {montant:,.0f} F CFA\n"
+        f"Mission : {numero}\n"
+        f"Bénéficiaire : {_nom(employe)}\n"
+        f"Retirée par : {_nom(auteur)}\n"
+        f"Montant justifié restant : {total:,.0f} F CFA sur {attendu:,.0f} F CFA attendus\n"
+        + (f"Reste à justifier : {reste:,.0f} F CFA\n" if reste > 0 else "")
+        + ("ATTENTION : cette justification avait déjà été validée.\n" if deja_validee else "")
+    )
+
+    # ── Comptables de la filiale ───────────────────────────────────────────
+    comptables = User.objects.filter(
+        profil__nom='Comptable',
+        filiales_attribuees=mission.entite,
+        is_active=True,
+    )
+    for comptable in comptables:
+        if comptable.pk == auteur.pk:
+            continue
+        sujet = f"[Gestion Missions] Pièce justificative retirée — {numero}"
+        texte = (
+            f"Bonjour {_nom(comptable)},\n\n"
+            f"Une pièce justificative a été retirée d'un dossier de votre filiale.\n\n"
+            f"{texte_commun}\nCordialement,\nGestion Missions"
+        )
+        html = _html(
+            titre="Pièce justificative retirée",
+            couleur_titre=couleur,
+            badge=badge, badge_couleur=badge_couleur,
+            lignes_html=_lignes(
+                comptable,
+                "Une pièce justificative vient d'être retirée d'un dossier d'hébergement "
+                "de votre filiale."),
+        )
+        _envoyer(sujet, texte, html, _email(comptable))
+
+    # ── L'employé, si le retrait vient de quelqu'un d'autre ────────────────
+    if auteur.pk != employe.pk:
+        sujet = f"[Gestion Missions] Une pièce de votre justification a été retirée — {numero}"
+        texte = (
+            f"Bonjour {_nom(employe)},\n\n"
+            f"Une pièce de votre justification de frais d'hébergement a été retirée.\n\n"
+            f"{texte_commun}\nCordialement,\nGestion Missions"
+        )
+        html = _html(
+            titre="Une pièce de votre justification a été retirée",
+            couleur_titre=couleur,
+            badge=badge, badge_couleur=badge_couleur,
+            lignes_html=_lignes(
+                employe,
+                "Une pièce de votre justification de frais d'hébergement a été retirée."),
+        )
+        _envoyer(sujet, texte, html, _email(employe))
 
 
 # ── 6. Validation comptable ──────────────────────────────────────────────────

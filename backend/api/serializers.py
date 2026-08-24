@@ -9,8 +9,9 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True,
+                                     validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
     class Meta:
         model = User
@@ -18,7 +19,10 @@ class RegisterSerializer(serializers.ModelSerializer):
                   'email_reciever', 'filiale', 'profil', 'category', 'direction')
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
+        # Aucun mot de passe fourni : il sera défini par l'utilisateur via le lien reçu par email.
+        if not attrs.get('password'):
+            return attrs
+        if attrs['password'] != attrs.get('password2'):
             raise serializers.ValidationError({'password': 'Les mots de passe ne correspondent pas.'})
         return attrs
 
@@ -29,14 +33,19 @@ class RegisterSerializer(serializers.ModelSerializer):
             matricule=validated_data.get('matricule', 'Inconnu'),
             fonction=validated_data.get('fonction', 'Inconnu'),
             date_naissance=validated_data.get('date_naissance', '1900-01-01'),
-            telephone=validated_data.get('telephone', 'Inconnu'),
+            telephone=validated_data.get('telephone'),
             email_reciever=validated_data.get('email_reciever', 'Inconnu'),
-            filiale=validated_data.get('filiale', 'Inconnu'),
-            profil=validated_data.get('profil', 'Inconnu'),
-            category=validated_data.get('category', 'Inconnu'),
-            direction=validated_data.get('category', 'direction')
+            filiale=validated_data.get('filiale'),
+            profil=validated_data.get('profil'),
+            category=validated_data.get('category'),
+            direction=validated_data.get('direction'),
         )
-        user.set_password(validated_data['password'])
+        mot_de_passe = validated_data.get('password')
+        if mot_de_passe:
+            user.set_password(mot_de_passe)
+        else:
+            # Compte en attente d'activation : mot de passe défini via le lien envoyé par email.
+            user.set_unusable_password()
         user.save()
         return user
 
@@ -279,7 +288,7 @@ class PieceJustificativePostSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     filiales_attribuees = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Entite.objects.all(), required=False
     )
@@ -306,9 +315,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         filiales = validated_data.pop('filiales_attribuees', [])
-        password = validated_data.pop('password')
+        password = validated_data.pop('password', None)
         user = User(**validated_data)
-        user.set_password(password)
+        if password:
+            user.set_password(password)
+        else:
+            # Compte en attente d'activation : mot de passe défini via le lien envoyé par email.
+            user.set_unusable_password()
         user.save()
         user.filiales_attribuees.set(filiales)
         return user
@@ -316,6 +329,16 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 class AdminPasswordUpdateSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=8)
+
+
+class DefinirMotDePasseSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({'password': 'Les mots de passe ne correspondent pas.'})
+        return attrs
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

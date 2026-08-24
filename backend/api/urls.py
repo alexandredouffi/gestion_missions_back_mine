@@ -9,11 +9,11 @@ from .views import RegisterView, LoginView, EntiteView, EntiteDetailView, UserVi
     EntiteAllList, UserAllView, DirectionAllView, UserDetailView, \
     JustificationHebergementView, PieceJustificativeView, UtilisateurBlocageView, AdminPasswordUpdateView, \
     MissionAPayerView, DelegationsMissionsASignerView, UserStatutView, \
-    MissionsJustifieesComptableView, ValidationComptableView, VerifyOTPView,TestEmail
+    MissionsJustifieesComptableView, ValidationComptableView, VerifyOTPView, \
+    DefinirMotDePasseView, RenvoyerLienMotDePasseView
 
 urlpatterns = [
     path('inscription/', RegisterView.as_view(), name='inscription'),
-    path('test-email/', TestEmail.as_view(), name='test-email'),
     path('authentification/', LoginView.as_view(), name='authentification'),
     path('authentification/verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
     path('utilisateur/', UserView.as_view(), name='utilisateur-detail'),
@@ -21,6 +21,8 @@ urlpatterns = [
     path('utilisateur/all/', UserAllView.as_view(), name='utilisateur-all'),
     path('utilisateur/<int:pk>/blocage/', UtilisateurBlocageView.as_view(), name='utilisateur-blocage'),
     path('utilisateur/<int:pk>/mot-de-passe/', AdminPasswordUpdateView.as_view(), name='utilisateur-mot-de-passe'),
+    path('utilisateur/<int:pk>/lien-mot-de-passe/', RenvoyerLienMotDePasseView.as_view(), name='utilisateur-lien-mot-de-passe'),
+    path('definir-mot-de-passe/<str:token>/', DefinirMotDePasseView.as_view(), name='definir-mot-de-passe'),
     path('utilisateur/<int:pk>/statut/', UserStatutView.as_view(), name='utilisateur-statut'),
     path('employes/all/', UserAllView.as_view(), name='employes-all'),
     path('entite/', EntiteView.as_view(), name='entite'),
