@@ -1,6 +1,6 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-
+import requests
 FROM = settings.DEFAULT_FROM_EMAIL
 
 # ── Palette ────────────────────────────────────────────────────────────────
@@ -150,17 +150,43 @@ def _info_block(libelle, valeur):
 
 
 def _envoyer(subject, texte, html, *recipients):
+    # valides = [e for e in recipients if e]
+    # if not valides:
+    #     _log(subject, [], 'IGNORE')
+    #     return
+    # try:
+    #     msg = EmailMultiAlternatives(subject, texte, FROM, valides)
+    #     msg.attach_alternative(html, 'text/html')
+    #     msg.send()
+    #     _log(subject, valides, 'ENVOYE')
+    # except Exception as exc:
+    #     _log(subject, valides, 'ECHEC', erreur=str(exc))
     valides = [e for e in recipients if e]
     if not valides:
-        _log(subject, [], 'IGNORE')
+        _log(subject, [], "IGNORE")
         return
+
+    url = "https://api.brevo.com/v3/smtp/email"
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "api-key": settings.BREVO_API_KEY,
+    }
+
+    payload = {
+        "sender": {"name": "Mon app", "email": settings.BREVO_SENDER_EMAIL},
+        "to": [{"email": email} for email in valides],
+        "subject": subject,
+        "htmlContent": html,
+        "textContent": texte,
+    }
+
     try:
-        msg = EmailMultiAlternatives(subject, texte, FROM, valides)
-        msg.attach_alternative(html, 'text/html')
-        msg.send()
-        _log(subject, valides, 'ENVOYE')
+        r = requests.post(url, json=payload, headers=headers, timeout=30)
+        r.raise_for_status()
+        _log(subject, valides, "ENVOYE")
     except Exception as exc:
-        _log(subject, valides, 'ECHEC', erreur=str(exc))
+        _log(subject, valides, "ECHEC", erreur=str(exc))
 
 
 # ── 0 bis. Définition du mot de passe ───────────────────────────────────────
