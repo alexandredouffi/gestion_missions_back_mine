@@ -125,10 +125,21 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # }
 
 DATABASES = {
-    "default": dj_database_url.config(
-        conn_max_age=600,
-        default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
-    )
+    # "default": dj_database_url.config(
+    #     conn_max_age=600,
+    #     default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+    # )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+       'NAME': 'vtc_dev',
+        'USER': 'admin',
+        'PASSWORD': 'Sylicab@2025',
+        'HOST': '173.212.193.4',
+        'PORT': '3306',
+        'OPTIONS': {
+            'sql_mode': 'traditional',
+        },
+    }
 }
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
