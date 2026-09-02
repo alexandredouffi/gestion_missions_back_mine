@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
 from .models import Entite, Profil, CategorieEmploye, Destination, Bareme, Direction, Workflow, \
-    MissionWorkflow, Mission, Delegation, Paiement, JustificationHebergement, PieceJustificative
+    MissionWorkflow, Mission, Delegation, Paiement, JustificationHebergement, PieceJustificative, \
+    Suppleance
 
 User = get_user_model()
 
@@ -175,17 +176,101 @@ class MissionPostSerializer(serializers.ModelSerializer):
 class MissionGetWorkflowSerializer(serializers.ModelSerializer):
     mission = MissionGetSerlializer(read_only=True)
     user_validation = UserSerializer(read_only=True)
+    traite_par = UserSerializer(read_only=True)
     statut_label = serializers.CharField(source='get_statut_display', read_only=True)
+    traite_en_suppleance = serializers.SerializerMethodField()
+    pour_le_compte_de = serializers.SerializerMethodField()
 
     class Meta:
         model = MissionWorkflow
-        fields = ('id', 'mission', 'numero_etape', 'libelle_etape', 'user_validation', 'statut', 'statut_label', 'date_validation', 'commentaire')
+        fields = ('id', 'mission', 'numero_etape', 'libelle_etape', 'user_validation',
+                  'traite_par', 'traite_en_suppleance', 'pour_le_compte_de',
+                  'statut', 'statut_label', 'date_validation', 'commentaire')
+
+    def get_traite_en_suppleance(self, obj):
+        return obj.suppleance_id is not None
+
+    def get_pour_le_compte_de(self, obj):
+        """Le titulaire pour qui l'étape a été traitée, si suppléance."""
+        if obj.suppleance_id is None or not obj.user_validation:
+            return None
+        u = obj.user_validation
+        return {'id': u.id, 'username': u.username,
+                'nom': f'{u.last_name} {u.first_name}'.strip()}
 
 
 class MissionPostWorkflowSerializer(serializers.ModelSerializer):
     class Meta:
         model = MissionWorkflow
         fields = ('mission', 'workflow', 'user_validation', 'statut', 'date_validation', 'commentaire')
+
+
+class SuppleanceGetSerializer(serializers.ModelSerializer):
+    titulaire = UserSerializer(read_only=True)
+    suppleant = UserSerializer(read_only=True)
+    cree_par = UserSerializer(read_only=True)
+    statut = serializers.CharField(read_only=True)
+    est_en_cours = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Suppleance
+        fields = ('id', 'titulaire', 'suppleant', 'date_debut', 'date_fin',
+                  'motif', 'active', 'statut', 'est_en_cours', 'cree_par', 'created_at')
+
+
+class SuppleancePostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suppleance
+        fields = ('titulaire', 'suppleant', 'date_debut', 'date_fin', 'motif')
+
+    def validate(self, attrs):
+        from .permissions import NOM_SIGNATAIRE, _est_admin
+
+        titulaire = attrs['titulaire']
+        suppleant = attrs['suppleant']
+        debut, fin = attrs['date_debut'], attrs['date_fin']
+
+        if titulaire.pk == suppleant.pk:
+            raise serializers.ValidationError(
+                {'suppleant': "On ne peut pas se désigner soi-même comme suppléant."})
+
+        if fin <= debut:
+            raise serializers.ValidationError(
+                {'date_fin': "La date de fin doit être postérieure à la date de début."})
+
+        if not suppleant.is_active:
+            raise serializers.ValidationError(
+                {'suppleant': "Ce compte est désactivé."})
+
+        # Sans profil Signataire, la suppléance contournerait la permission IsSignataire.
+        profil = suppleant.profil.nom if suppleant.profil else None
+        if profil != NOM_SIGNATAIRE and not _est_admin(suppleant):
+            raise serializers.ValidationError(
+                {'suppleant': "Le suppléant doit avoir le profil Signataire."})
+
+        # Une seule suppléance active à la fois par titulaire, sinon la
+        # résolution devient ambiguë.
+        chevauche = Suppleance.objects.filter(
+            titulaire=titulaire, active=True,
+            date_debut__lt=fin, date_fin__gt=debut,
+        )
+        if self.instance:
+            chevauche = chevauche.exclude(pk=self.instance.pk)
+        if chevauche.exists():
+            existante = chevauche.first()
+            raise serializers.ValidationError(
+                {'date_debut': f"Une suppléance active chevauche déjà cette période "
+                               f"({existante.date_debut:%d/%m/%Y} → {existante.date_fin:%d/%m/%Y})."})
+
+        # Pas de chaîne : on refuse de désigner quelqu'un qui délègue déjà à ce moment-là.
+        if Suppleance.objects.filter(
+            titulaire=suppleant, active=True, date_debut__lt=fin, date_fin__gt=debut
+        ).exists():
+            raise serializers.ValidationError(
+                {'suppleant': "Ce suppléant est lui-même absent sur cette période. "
+                              "Les suppléances ne se chaînent pas."})
+
+        return attrs
 
 
 class TraiterMissionSerializer(serializers.Serializer):

@@ -6,22 +6,25 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404, render
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from django.db.models.deletion import ProtectedError
 # from django.db import connection
 
-from .permissions import HasMissionAccess, IsSignataire, IsTresorier, IsComptable, IsAdministrateur, NOM_COMPTABLE, _est_admin
+from .permissions import HasMissionAccess, IsSignataire, IsTresorier, IsComptable, IsAdministrateur, \
+    NOM_COMPTABLE, _est_admin, peut_traiter_etape, filtre_etapes_accessibles, \
+    peut_consulter_mission, dossiers_bloquants, resume_blocage
 from .notifications import (
     notifier_creation_mission, notifier_ajout_delegation,
     notifier_retrait_delegation, collecter_contexte_retrait_delegation,
     notifier_traitement_mission, notifier_paiement,
     notifier_justification_complete, notifier_validation_comptable, notifier_piece_retiree,
-    notifier_lien_mot_de_passe,
+    notifier_lien_mot_de_passe, notifier_suppleance,
     _envoyer_otp, _email,
 )
 
 from .models import Entite, User, Profil, CategorieEmploye, Destination, Bareme, Direction, Workflow, \
     Mission, MissionWorkflow, Delegation, Paiement, JustificationHebergement, PieceJustificative, NotificationLog, \
-    PasswordSetupToken
+    PasswordSetupToken, Suppleance
 from .serializers import RegisterSerializer, LoginSerializer, EntiteSerializer, UserSerializer, ProfilSerializer, \
     CategorieEmployeSerializer, DestinationSerializer, BaremeGetSerializer, BaremePostSerializer, \
     DirectionPostSerializer, DirectionGetSerializer, WorkflowGetSerializer, WorkflowPostSerializer, \
@@ -29,7 +32,59 @@ from .serializers import RegisterSerializer, LoginSerializer, EntiteSerializer, 
     MissionGetWorkflowSerializer, MissionPostWorkflowSerializer, TraiterMissionSerializer, \
     DelegationGetSerializer, DelegationPostSerializer, PaiementGetSerializer, PaiementPostSerializer, \
     JustificationHebergementSerializer, PieceJustificativePostSerializer, \
-    UserCreateSerializer, UserUpdateSerializer, AdminPasswordUpdateSerializer, DefinirMotDePasseSerializer
+    UserCreateSerializer, UserUpdateSerializer, AdminPasswordUpdateSerializer, DefinirMotDePasseSerializer, \
+    SuppleanceGetSerializer, SuppleancePostSerializer
+
+
+def _reponse_protegee(exc, libelle):
+    """
+    Traduit un ProtectedError en réponse 409 lisible.
+    Le champ `blocages` permet au frontend d'expliquer précisément ce qui coince.
+    """
+    compte = {}
+    for obj in exc.protected_objects:
+        nom = str(obj._meta.verbose_name)
+        compte[nom] = compte.get(nom, 0) + 1
+
+    details = ', '.join(f"{n} {nom}{'s' if n > 1 and not nom.endswith('s') else ''}"
+                        for nom, n in sorted(compte.items(), key=lambda x: -x[1]))
+    return Response(
+        {
+            "message": f"Suppression impossible : {libelle} est encore référencé par {details}. "
+                       f"Réaffectez ou supprimez ces éléments d'abord.",
+            "blocages": compte,
+        },
+        status=status.HTTP_409_CONFLICT
+    )
+
+
+def _refus_si_bloque(employe):
+    """
+    Réponse 409 si `employe` a un hébergement payé non régularisé, sinon None.
+    Un utilisateur bloqué ne peut pas être envoyé en nouvelle mission.
+    """
+    problemes = dossiers_bloquants(employe)
+    if not problemes:
+        return None
+
+    return Response(
+        {
+            "message": (
+                f"{employe.username} ne peut pas être ajouté à une mission : "
+                f"{len(problemes)} hébergement(s) payé(s) non régularisé(s). "
+                f"Ces dossiers doivent être justifiés et validés par le comptable."
+            ),
+            "est_bloque": True,
+            "resume": resume_blocage(problemes),
+            "delegations_non_justifiees": problemes,
+        },
+        status=status.HTTP_409_CONFLICT
+    )
+
+
+def _paiements_de_mission(mission):
+    """Paiements enregistrés sur les délégations d'une mission."""
+    return Paiement.objects.filter(delegation__mission=mission)
 
 
 def envoyer_lien_mot_de_passe(user, motif='CREATION'):
@@ -308,6 +363,11 @@ class UserView(APIView):
 
 
 class UserDetailView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'DELETE':
+            return [IsAdministrateur()]
+        return [IsAuthenticated()]
+
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         serializer = UserSerializer(user)
@@ -318,7 +378,10 @@ class UserDetailView(APIView):
 
     def delete(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-        user.delete()
+        try:
+            user.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"l'utilisateur « {user.username} »")
 
         return Response(
             {
@@ -388,47 +451,21 @@ class UtilisateurBlocageView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
+        """
+        Un utilisateur est bloqué dès qu'un hébergement lui a été **payé** sans
+        que la justification correspondante soit déposée, complète et validée
+        par le comptable.
+        """
         user = get_object_or_404(User, pk=pk)
-        delegations = Delegation.objects.filter(
-            employe=user,
-            est_longue_duree=False,
-            montant_hebergement__gt=0,
-            mission__statut_mission__in=['APPROUVEE', 'TERMINEE']
-        ).select_related('mission', 'mission__destination_mission').prefetch_related(
-            'justification_hebergement__pieces'
-        )
-
-        problemes = []
-        for d in delegations:
-            try:
-                total = d.justification_hebergement.pieces.aggregate(
-                    total=Sum('montant')
-                )['total'] or 0
-                if total < d.montant_hebergement:
-                    problemes.append({
-                        'delegation_id': d.pk,
-                        'mission': d.mission.numero_mission,
-                        'objet_mission': d.mission.objet_mission,
-                        'montant_hebergement': d.montant_hebergement,
-                        'montant_justifie': total,
-                        'reste_a_justifier': d.montant_hebergement - total,
-                    })
-            except JustificationHebergement.DoesNotExist:
-                problemes.append({
-                    'delegation_id': d.pk,
-                    'mission': d.mission.numero_mission,
-                    'objet_mission': d.mission.objet_mission,
-                    'montant_hebergement': d.montant_hebergement,
-                    'montant_justifie': 0,
-                    'reste_a_justifier': d.montant_hebergement,
-                })
+        problemes = dossiers_bloquants(user)
 
         return Response({
             'est_bloque': len(problemes) > 0,
             'message': (
-                f"{len(problemes)} hébergement(s) non justifié(s) en attente."
+                f"{len(problemes)} hébergement(s) payé(s) non régularisé(s)."
                 if problemes else "Aucun blocage."
             ),
+            'resume': resume_blocage(problemes),
             'delegations_non_justifiees': problemes,
         }, status=status.HTTP_200_OK)
 
@@ -524,7 +561,10 @@ class EntiteDetailView(APIView):
 
     def delete(self, request, pk):
         entite = get_object_or_404(Entite, pk=pk)
-        entite.delete()
+        try:
+            entite.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"l'entité « {entite.nom} »")
 
         return Response(
             {
@@ -627,7 +667,10 @@ class DestinationAllView(APIView):
 
 
 class DestinationDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method in ('POST', 'PUT', 'DELETE'):
+            return [IsAdministrateur()]
+        return [IsAuthenticated()]
 
     def get(self, request, pk):
         destination = get_object_or_404(Destination, pk=pk)
@@ -653,7 +696,10 @@ class DestinationDetailView(APIView):
 
     def delete(self, request, pk):
         destination = get_object_or_404(Destination, pk=pk)
-        destination.delete()
+        try:
+            destination.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"la destination « {destination.nom} »")
         return Response(
             {"message": "Destination supprimée avec succès"},
             status=status.HTTP_204_NO_CONTENT
@@ -722,7 +768,10 @@ class BaremeDetailView(APIView):
 
     def delete(self, request, pk):
         bareme = get_object_or_404(Bareme, pk=pk)
-        bareme.delete()
+        try:
+            bareme.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"le barème #{bareme.pk}")
 
         return Response(
             {
@@ -808,7 +857,10 @@ class DirectionDetailView(APIView):
 
     def delete(self, request, pk):
         direction = get_object_or_404(Direction, pk=pk)
-        direction.delete()
+        try:
+            direction.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"la direction « {direction.nom} »")
 
         return Response(
             {
@@ -885,7 +937,10 @@ class WorkflowDetailView(APIView):
 
     def delete(self, request, pk):
         workflow = get_object_or_404(Workflow, pk=pk)
-        workflow.delete()
+        try:
+            workflow.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"l'étape « {workflow.libelle_etape} »")
         return Response(
             {"message": "Workflow supprimé avec succès"},
             status=status.HTTP_204_NO_CONTENT
@@ -902,29 +957,21 @@ class MissionView(APIView):
 
     def post(self, request):
         demandeur_id = request.data.get('demandeur')
-        if demandeur_id and not _est_admin(request.user):
-            delegations_non_justifiees = Delegation.objects.filter(
-                employe_id=demandeur_id,
-                est_longue_duree=False,
-                montant_hebergement__gt=0,
-                mission__statut_mission__in=['APPROUVEE', 'TERMINEE']
-            ).prefetch_related('justification_hebergement__pieces')
-
-            for d in delegations_non_justifiees:
-                try:
-                    total = d.justification_hebergement.pieces.aggregate(
-                        total=Sum('montant')
-                    )['total'] or 0
-                    if total < d.montant_hebergement:
-                        return Response(
-                            {"message": "Vous avez des frais d'hébergement non justifiés. Veuillez les justifier avant de soumettre une nouvelle mission."},
-                            status=status.HTTP_403_FORBIDDEN
-                        )
-                except JustificationHebergement.DoesNotExist:
-                    return Response(
-                        {"message": "Vous avez des frais d'hébergement non justifiés. Veuillez les justifier avant de soumettre une nouvelle mission."},
-                        status=status.HTTP_403_FORBIDDEN
-                    )
+        if demandeur_id:
+            demandeur = get_object_or_404(User, pk=demandeur_id)
+            problemes = dossiers_bloquants(demandeur)
+            if problemes:
+                return Response(
+                    {
+                        "message": "Vous avez des frais d'hébergement payés non "
+                                   "régularisés. Ils doivent être justifiés et validés "
+                                   "par le comptable avant de soumettre une nouvelle mission.",
+                        "est_bloque": True,
+                        "resume": resume_blocage(problemes),
+                        "delegations_non_justifiees": problemes,
+                    },
+                    status=status.HTTP_403_FORBIDDEN
+                )
 
         serializer = MissionPostSerializer(data=request.data)
         if serializer.is_valid():
@@ -988,7 +1035,40 @@ class MissionDetailView(APIView):
 
     def delete(self, request, pk):
         mission = get_object_or_404(Mission, pk=pk)
-        mission.delete()
+
+        if not _est_admin(request.user) and mission.demandeur_id != request.user.pk:
+            return Response(
+                {"message": "Seul le demandeur de la mission ou un administrateur "
+                            "peut la supprimer."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Supprimer la mission détruit ses délégations, donc les paiements
+        # et justifications associés. On refuse dès qu'un paiement existe.
+        paiements = _paiements_de_mission(mission)
+        if paiements.exists():
+            return Response(
+                {
+                    "message": f"Suppression impossible : {paiements.count()} paiement(s) "
+                               f"sont enregistrés sur cette mission. Supprimez-les d'abord.",
+                    "paiements": [
+                        {
+                            "delegation_id": p.delegation_id,
+                            "employe": p.delegation.employe.username,
+                            "montant": p.montant,
+                            "effectue": p.effectue,
+                        }
+                        for p in paiements.select_related('delegation__employe')
+                    ],
+                },
+                status=status.HTTP_409_CONFLICT
+            )
+
+        try:
+            mission.delete()
+        except ProtectedError as exc:
+            return _reponse_protegee(exc, f"la mission {mission.numero_mission}")
+
         return Response(
             {"message": "Mission supprimée avec succès"},
             status=status.HTTP_204_NO_CONTENT
@@ -1040,6 +1120,10 @@ class TraiterMissionView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        autorise, suppleance, motif = peut_traiter_etape(request.user, etape)
+        if not autorise:
+            return Response({"message": motif}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = TraiterMissionSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -1050,7 +1134,9 @@ class TraiterMissionView(APIView):
         etape.statut = nouveau_statut
         etape.commentaire = commentaire
         etape.date_validation = timezone.now()
-        etape.user_validation = request.user
+        # user_validation reste le signataire DÉSIGNÉ : on ne l'écrase jamais.
+        etape.traite_par = request.user
+        etape.suppleance = suppleance
         etape.save()
 
         mission = etape.mission
@@ -1096,22 +1182,12 @@ class DelegationMissionView(APIView):
 
     def get(self, request, pk):
         mission = get_object_or_404(Mission, pk=pk)
-        user = request.user
 
-        if not _est_admin(user):
-            est_demandeur = mission.demandeur_id == user.pk
-            est_signataire_de_la_mission = MissionWorkflow.objects.filter(
-                mission=mission, workflow__user=user
-            ).exists()
-            filiale_id = getattr(mission.entite, 'pk', None)
-            filiales_ids = list(user.filiales_attribuees.values_list('pk', flat=True))
-            est_tresorier_ou_comptable = filiale_id in filiales_ids
-
-            if not (est_demandeur or est_signataire_de_la_mission or est_tresorier_ou_comptable):
-                return Response(
-                    {"message": "Vous n'êtes pas autorisé à consulter cette délégation."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        if not peut_consulter_mission(request.user, mission):
+            return Response(
+                {"message": "Vous n'êtes pas autorisé à consulter cette délégation."},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         delegations = Delegation.objects.filter(mission=mission).select_related('employe', 'bareme')
         serializer = DelegationGetSerializer(delegations, many=True)
@@ -1126,6 +1202,10 @@ class DelegationMissionView(APIView):
         data['mission'] = mission.pk
         serializer = DelegationPostSerializer(data=data)
         if serializer.is_valid():
+            refus = _refus_si_bloque(serializer.validated_data['employe'])
+            if refus is not None:
+                return refus
+
             delegation = serializer.save()
             notifier_ajout_delegation(delegation)
             return Response(
@@ -1153,6 +1233,14 @@ class DelegationDetailView(APIView):
         delegation = get_object_or_404(Delegation, pk=pk)
         serializer = DelegationPostSerializer(delegation, data=request.data)
         if serializer.is_valid():
+            # Contrôle uniquement si l'on change de bénéficiaire : sinon toute
+            # modification d'une délégation existante deviendrait impossible.
+            nouvel_employe = serializer.validated_data.get('employe')
+            if nouvel_employe and nouvel_employe.pk != delegation.employe_id:
+                refus = _refus_si_bloque(nouvel_employe)
+                if refus is not None:
+                    return refus
+
             delegation = serializer.save()
             return Response(
                 {"message": "Membre mis à jour", "data": DelegationGetSerializer(delegation).data},
@@ -1174,6 +1262,25 @@ class DelegationDetailView(APIView):
 
     def delete(self, request, pk):
         delegation = get_object_or_404(Delegation, pk=pk)
+
+        # Retirer un membre détruit en cascade son paiement et sa justification.
+        paiement = getattr(delegation, 'paiement', None)
+        if paiement is not None:
+            return Response(
+                {
+                    "message": f"Suppression impossible : un paiement de "
+                               f"{paiement.montant:,.0f} F CFA est enregistré pour "
+                               f"{delegation.employe.username}. Supprimez-le d'abord.",
+                    "paiement": {
+                        "id": paiement.pk,
+                        "mode": paiement.mode,
+                        "montant": paiement.montant,
+                        "effectue": paiement.effectue,
+                    },
+                },
+                status=status.HTTP_409_CONFLICT
+            )
+
         contexte = collecter_contexte_retrait_delegation(delegation)
 
         delegation.delete()
@@ -1386,6 +1493,122 @@ class PieceJustificativeView(APIView):
         )
 
 
+class SuppleanceView(APIView):
+    """Déclarer une absence et consulter les suppléances."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """
+        ?role=accordees  → les suppléances que j'ai accordées (mes absences)
+        ?role=recues     → celles dont je suis le suppléant
+        ?titulaire=<pk>  → admin uniquement
+        défaut           → les deux me concernant
+        """
+        role = request.query_params.get('role')
+        titulaire = request.query_params.get('titulaire')
+
+        if titulaire:
+            if not _est_admin(request.user):
+                return Response(
+                    {"message": "Réservé aux administrateurs."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            qs = Suppleance.objects.filter(titulaire_id=titulaire)
+        elif role == 'accordees':
+            qs = Suppleance.objects.filter(titulaire=request.user)
+        elif role == 'recues':
+            qs = Suppleance.objects.filter(suppleant=request.user)
+        else:
+            qs = Suppleance.objects.filter(
+                Q(titulaire=request.user) | Q(suppleant=request.user))
+
+        qs = qs.select_related('titulaire', 'suppleant', 'cree_par')
+        return Response(
+            {"message": "Suppléances", "data": SuppleanceGetSerializer(qs, many=True).data},
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        """Le titulaire déclare son absence ; un admin peut le faire à sa place."""
+        data = request.data.copy()
+        data.setdefault('titulaire', request.user.pk)
+
+        if str(data['titulaire']) != str(request.user.pk) and not _est_admin(request.user):
+            return Response(
+                {"message": "Vous ne pouvez déclarer une absence que pour vous-même."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = SuppleancePostSerializer(data=data)
+        if not serializer.is_valid():
+            return Response(
+                {"errors": serializer.errors, "message": "Échec de la création"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        suppleance = serializer.save(cree_par=request.user)
+        notifier_suppleance(suppleance, request.user, evenement='CREATION')
+        return Response(
+            {"message": "Suppléance enregistrée. Le suppléant a été prévenu.",
+             "data": SuppleanceGetSerializer(suppleance).data},
+            status=status.HTTP_201_CREATED
+        )
+
+
+class SuppleanceDetailView(APIView):
+    """Fin anticipée ou annulation d'une suppléance."""
+    permission_classes = [IsAuthenticated]
+
+    def _autorise(self, request, suppleance):
+        return _est_admin(request.user) or suppleance.titulaire_id == request.user.pk
+
+    def patch(self, request, pk):
+        """Retour anticipé : la suppléance cesse immédiatement."""
+        suppleance = get_object_or_404(Suppleance, pk=pk)
+        if not self._autorise(request, suppleance):
+            return Response(
+                {"message": "Seul le titulaire ou un administrateur peut mettre fin "
+                            "à cette suppléance."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if not suppleance.active:
+            return Response(
+                {"message": "Cette suppléance est déjà terminée."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        suppleance.terminer()
+        notifier_suppleance(suppleance, request.user, evenement='FIN')
+        return Response(
+            {"message": "Suppléance terminée.",
+             "data": SuppleanceGetSerializer(suppleance).data},
+            status=status.HTTP_200_OK
+        )
+
+    def delete(self, request, pk):
+        """Annule une suppléance qui n'a encore rien traité."""
+        suppleance = get_object_or_404(Suppleance, pk=pk)
+        if not self._autorise(request, suppleance):
+            return Response(
+                {"message": "Seul le titulaire ou un administrateur peut supprimer "
+                            "cette suppléance."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        nb = suppleance.etapes_traitees.count()
+        if nb:
+            return Response(
+                {"message": f"Suppression impossible : {nb} étape(s) ont été traitées "
+                            f"sous cette suppléance. Utilisez PATCH pour y mettre fin "
+                            f"en conservant l'historique."},
+                status=status.HTTP_409_CONFLICT
+            )
+
+        suppleance.delete()
+        return Response({"message": "Suppléance supprimée."},
+                        status=status.HTTP_204_NO_CONTENT)
+
+
 class EtapesMissionView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -1494,10 +1717,11 @@ class MissionATraiterView(APIView):
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
 
+        # Ses propres étapes, plus celles des titulaires qu'il supplée en ce moment.
         etapes_en_attente = MissionWorkflow.objects.filter(
-            user_validation=user,
+            filtre_etapes_accessibles(user),
             statut='EN_ATTENTE'
-        ).select_related('mission')
+        ).select_related('mission', 'user_validation')
 
         missions_a_traiter = [
             etape for etape in etapes_en_attente
@@ -1508,8 +1732,23 @@ class MissionATraiterView(APIView):
         ]
 
         serializer = MissionGetWorkflowSerializer(missions_a_traiter, many=True)
+        data = serializer.data
+
+        # Marque les lignes que l'utilisateur traiterait au titre d'une suppléance.
+        for ligne, etape in zip(data, missions_a_traiter):
+            en_suppleance = etape.user_validation_id != user.pk
+            ligne['a_traiter_en_suppleance'] = en_suppleance
+            ligne['titulaire'] = (
+                {
+                    'id': etape.user_validation.id,
+                    'username': etape.user_validation.username,
+                    'nom': f'{etape.user_validation.last_name} '
+                           f'{etape.user_validation.first_name}'.strip(),
+                } if en_suppleance and etape.user_validation else None
+            )
+
         return Response(
-            {"message": "Missions à traiter", "data": serializer.data},
+            {"message": "Missions à traiter", "data": data},
             status=status.HTTP_200_OK
         )
 

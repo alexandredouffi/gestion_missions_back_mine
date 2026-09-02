@@ -10,7 +10,8 @@ from .views import RegisterView, LoginView, EntiteView, EntiteDetailView, UserVi
     JustificationHebergementView, PieceJustificativeView, UtilisateurBlocageView, AdminPasswordUpdateView, \
     MissionAPayerView, DelegationsMissionsASignerView, UserStatutView, \
     MissionsJustifieesComptableView, ValidationComptableView, VerifyOTPView, \
-    DefinirMotDePasseView, RenvoyerLienMotDePasseView
+    DefinirMotDePasseView, RenvoyerLienMotDePasseView, \
+    SuppleanceView, SuppleanceDetailView
 
 urlpatterns = [
     path('inscription/', RegisterView.as_view(), name='inscription'),
@@ -55,6 +56,8 @@ urlpatterns = [
     path('justification/<int:pk>/validation-comptable/', ValidationComptableView.as_view(), name='validation-comptable'),
     path('mission-workflow/', MissionWorkflowView.as_view(), name='mission-workflow'),
     path('mission-workflow/<int:pk>/traiter/', TraiterMissionView.as_view(), name='traiter-mission'),
+    path('suppleance/', SuppleanceView.as_view(), name='suppleance'),
+    path('suppleance/<int:pk>/', SuppleanceDetailView.as_view(), name='suppleance-detail'),
     path('delegation/mission/<int:pk>/', DelegationMissionView.as_view(), name='delegation-mission'),
     path('delegation/<int:pk>/', DelegationDetailView.as_view(), name='delegation-detail'),
     path('paiement/mission/<int:pk>/', PaiementMissionView.as_view(), name='paiement-mission'),

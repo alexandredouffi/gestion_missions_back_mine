@@ -13,10 +13,10 @@ class User(AbstractUser):
     date_naissance = models.DateField(null=False, blank=False, unique=False, default='1900-01-01')
     telephone = models.CharField(max_length=20, null=True, blank=True)
     email_reciever = models.EmailField(null=True, blank=True, default='Inconnu')
-    filiale = models.ForeignKey('Entite', on_delete=models.CASCADE, null=True, blank=True)
-    profil = models.ForeignKey('Profil', on_delete=models.CASCADE, null=True, blank=True)
-    category = models.ForeignKey('CategorieEmploye', on_delete=models.CASCADE, null=True, blank=True)
-    direction = models.ForeignKey('Direction', on_delete=models.CASCADE, null=True, blank=True)
+    filiale = models.ForeignKey('Entite', on_delete=models.SET_NULL, null=True, blank=True)
+    profil = models.ForeignKey('Profil', on_delete=models.SET_NULL, null=True, blank=True)
+    category = models.ForeignKey('CategorieEmploye', on_delete=models.SET_NULL, null=True, blank=True)
+    direction = models.ForeignKey('Direction', on_delete=models.SET_NULL, null=True, blank=True)
     filiales_attribuees = models.ManyToManyField('Entite', blank=True, related_name='utilisateurs_attribues')
 
     class Meta:
@@ -38,7 +38,7 @@ class Entite(models.Model):
 
 class Direction(models.Model):
     nom = models.CharField(max_length=100, null=False, blank=False)
-    filiale = models.ForeignKey('Entite', on_delete=models.CASCADE, null=False, blank=False)
+    filiale = models.ForeignKey('Entite', on_delete=models.PROTECT, null=False, blank=False)
     description = models.CharField(max_length=100, null=True, blank=True, unique=False)
 
     class Meta:
@@ -88,9 +88,9 @@ class Destination(models.Model):
 
 
 class Bareme(models.Model):
-    filiale = models.ForeignKey('Entite', on_delete=models.CASCADE, null=True, blank=True)
-    categorie = models.ForeignKey('CategorieEmploye', on_delete=models.CASCADE, null=True, blank=True)
-    destination = models.ForeignKey('Destination', on_delete=models.CASCADE, null=True, blank=True)
+    filiale = models.ForeignKey('Entite', on_delete=models.PROTECT, null=True, blank=True)
+    categorie = models.ForeignKey('CategorieEmploye', on_delete=models.PROTECT, null=True, blank=True)
+    destination = models.ForeignKey('Destination', on_delete=models.PROTECT, null=True, blank=True)
     hebergement = models.PositiveIntegerField(default=0)
     perdiem = models.PositiveIntegerField(default=0)
     communication = models.PositiveIntegerField(default=0)
@@ -118,18 +118,18 @@ class Mission(models.Model):
     ]
 
     date_demande = models.DateField()
-    entite = models.ForeignKey('Entite', on_delete=models.CASCADE)
+    entite = models.ForeignKey('Entite', on_delete=models.PROTECT)
     objet_mission = models.CharField(max_length=255)
     date_depart = models.DateField()
     date_retour = models.DateField()
     lieu_mission = models.CharField(max_length=255)
     statut_mission = models.CharField(max_length=20, choices=STATUTS_MISSION, default='EN_ATTENTE')
     numero_mission = models.CharField(max_length=100, unique=True, blank=True)
-    destination_mission = models.ForeignKey('Destination', on_delete=models.CASCADE)
+    destination_mission = models.ForeignKey('Destination', on_delete=models.PROTECT)
     contexte_mission = models.TextField(blank=True, null=True)
     objectifs_mission = models.TextField(blank=True, null=True)
     frais_extra = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    demandeur = models.ForeignKey('User', on_delete=models.CASCADE)
+    demandeur = models.ForeignKey('User', on_delete=models.PROTECT)
 
     class Meta:
         db_table = 'missions'
@@ -166,7 +166,7 @@ class Mission(models.Model):
 
 
 class Workflow(models.Model):
-    filiale = models.ForeignKey('Entite', on_delete=models.CASCADE)
+    filiale = models.ForeignKey('Entite', on_delete=models.PROTECT)
     numero_etape = models.PositiveIntegerField()
     libelle_etape = models.CharField(max_length=255)
     user = models.ForeignKey('User', on_delete=models.SET_NULL, null=True, blank=True, related_name='etapes_workflow')
@@ -184,7 +184,7 @@ class Workflow(models.Model):
 
 class Delegation(models.Model):
     mission = models.ForeignKey('Mission', on_delete=models.CASCADE, related_name='delegations')
-    employe = models.ForeignKey('User', on_delete=models.CASCADE, related_name='delegations')
+    employe = models.ForeignKey('User', on_delete=models.PROTECT, related_name='delegations')
     est_chef = models.BooleanField(default=False)
     bareme = models.ForeignKey('Bareme', on_delete=models.SET_NULL, null=True, blank=True)
     duree = models.PositiveIntegerField(default=0)
@@ -425,6 +425,77 @@ class NotificationLog(models.Model):
         return f"[{self.statut}] {self.sujet} — {self.date_envoi:%d/%m/%Y %H:%M}"
 
 
+class Suppleance(models.Model):
+    """
+    Délégation de signature : pendant son absence, un signataire (titulaire)
+    autorise un autre utilisateur (suppléant) à traiter ses étapes de workflow.
+    Nommée « Suppleance » et non « Delegation » : ce dernier nom désigne déjà
+    les membres d'une mission.
+    """
+
+    titulaire = models.ForeignKey(
+        'User', on_delete=models.CASCADE, related_name='suppleances_accordees')
+    suppleant = models.ForeignKey(
+        'User', on_delete=models.CASCADE, related_name='suppleances_recues')
+    date_debut = models.DateTimeField()
+    date_fin = models.DateTimeField()
+    motif = models.CharField(max_length=255, blank=True)
+    active = models.BooleanField(default=True)
+    cree_par = models.ForeignKey(
+        'User', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='suppleances_creees')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Suppléance de signature"
+        verbose_name_plural = "Suppléances de signature"
+        ordering = ['-date_debut']
+        indexes = [models.Index(fields=['titulaire', 'active', 'date_debut', 'date_fin'])]
+
+    @property
+    def est_en_cours(self):
+        return self.active and self.date_debut <= timezone.now() <= self.date_fin
+
+    @property
+    def statut(self):
+        maintenant = timezone.now()
+        if not self.active:
+            return 'TERMINEE'
+        if maintenant < self.date_debut:
+            return 'PLANIFIEE'
+        if maintenant > self.date_fin:
+            return 'EXPIREE'
+        return 'EN_COURS'
+
+    @classmethod
+    def resoudre(cls, titulaire_id, suppleant):
+        """
+        Retourne la suppléance en cours autorisant `suppleant` à agir pour
+        `titulaire_id`, ou None. Le suppléant hérite de TOUS les dossiers en cours
+        du titulaire, sans distinction de filiale.
+        Résolution sur UN SEUL niveau : le suppléant d'un suppléant n'hérite de rien.
+        """
+        if titulaire_id is None or titulaire_id == suppleant.pk:
+            return None
+        maintenant = timezone.now()
+        return cls.objects.filter(
+            titulaire_id=titulaire_id,
+            suppleant=suppleant,
+            active=True,
+            date_debut__lte=maintenant,
+            date_fin__gte=maintenant,
+        ).first()
+
+    def terminer(self):
+        """Retour anticipé : la suppléance cesse immédiatement, l'historique reste."""
+        self.active = False
+        self.save(update_fields=['active'])
+
+    def __str__(self):
+        return (f"{self.suppleant.username} supplée {self.titulaire.username} "
+                f"({self.date_debut:%d/%m/%Y} → {self.date_fin:%d/%m/%Y}) — {self.statut}")
+
+
 class MissionWorkflow(models.Model):
     STATUTS = [
         ('EN_ATTENTE', 'En attente'),
@@ -442,6 +513,22 @@ class MissionWorkflow(models.Model):
         null=True,
         blank=True,
         related_name='validations_mission'
+    )
+    traite_par = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='etapes_traitees',
+        help_text="Qui a réellement agi — peut différer du signataire désigné."
+    )
+    suppleance = models.ForeignKey(
+        'Suppleance',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='etapes_traitees',
+        help_text="Renseigné si l'étape a été traitée au titre d'une suppléance."
     )
     statut = models.CharField(max_length=20, choices=STATUTS, default='EN_ATTENTE')
     date_validation = models.DateTimeField(null=True, blank=True)

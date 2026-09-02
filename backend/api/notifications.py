@@ -1,8 +1,39 @@
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
-import requests
-FROM = settings.DEFAULT_FROM_EMAIL
 
+FROM = settings.DEFAULT_FROM_EMAIL
+import os
+import requests
+
+BREVO_API_KEY = settings.BREVO_API_KEY
+FROM_EMAIL = FROM
+FROM_NAME = "GEMA"
+
+def envoyer_mail_brevo(subject, html_content, recipients, text_content=""):
+    url = "https://api.brevo.com/v3/smtp/email"
+
+    payload = {
+        "sender": {
+            "name": FROM_NAME,
+            "email": FROM_EMAIL,
+        },
+        "to": [{"email": email} for email in recipients if email],
+        "subject": subject,
+        "htmlContent": html_content,
+    }
+
+    if text_content:
+        payload["textContent"] = text_content
+
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "api-key": BREVO_API_KEY,
+    }
+
+    response = requests.post(url, json=payload, headers=headers, timeout=30)
+    response.raise_for_status()
+    return response.json()
 # ── Palette ────────────────────────────────────────────────────────────────
 COLOR_PRIMARY   = '#1B3A6B'   # bleu marine
 COLOR_ACCENT    = '#2E86DE'   # bleu vif
@@ -150,43 +181,18 @@ def _info_block(libelle, valeur):
 
 
 def _envoyer(subject, texte, html, *recipients):
-    # valides = [e for e in recipients if e]
-    # if not valides:
-    #     _log(subject, [], 'IGNORE')
-    #     return
-    # try:
-    #     msg = EmailMultiAlternatives(subject, texte, FROM, valides)
-    #     msg.attach_alternative(html, 'text/html')
-    #     msg.send()
-    #     _log(subject, valides, 'ENVOYE')
-    # except Exception as exc:
-    #     _log(subject, valides, 'ECHEC', erreur=str(exc))
     valides = [e for e in recipients if e]
     if not valides:
-        _log(subject, [], "IGNORE")
+        _log(subject, [], 'IGNORE')
         return
-
-    url = "https://api.brevo.com/v3/smtp/email"
-    headers = {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "api-key": settings.BREVO_API_KEY,
-    }
-
-    payload = {
-        "sender": {"name": "Mon app", "email": settings.BREVO_SENDER_EMAIL},
-        "to": [{"email": email} for email in valides],
-        "subject": subject,
-        "htmlContent": html,
-        "textContent": texte,
-    }
-
     try:
-        r = requests.post(url, json=payload, headers=headers, timeout=30)
-        r.raise_for_status()
-        _log(subject, valides, "ENVOYE")
+        # msg = EmailMultiAlternatives(subject, texte, FROM, valides)
+        # msg.attach_alternative(html, 'text/html')
+        # msg.send()
+        envoyer_mail_brevo(subject, html, valides, text_content="")
+        _log(subject, valides, 'ENVOYE')
     except Exception as exc:
-        _log(subject, valides, "ECHEC", erreur=str(exc))
+        _log(subject, valides, 'ECHEC', erreur=str(exc))
 
 
 # ── 0 bis. Définition du mot de passe ───────────────────────────────────────
@@ -597,6 +603,82 @@ def notifier_retrait_delegation(contexte, auteur):
         _envoyer(sujet, texte, html, _email(destinataire))
 
 
+def notifier_suppleance(suppleance, auteur, evenement='CREATION'):
+    """Prévient le suppléant et le titulaire de l'ouverture ou de la fin d'une suppléance."""
+    titulaire = suppleance.titulaire
+    suppleant = suppleance.suppleant
+    creation = evenement == 'CREATION'
+
+    periode = (f"du {suppleance.date_debut:%d/%m/%Y %H:%M} "
+               f"au {suppleance.date_fin:%d/%m/%Y %H:%M}")
+
+    couleur = COLOR_ACCENT if creation else COLOR_MUTED
+    badge = "SUPPLÉANCE OUVERTE" if creation else "SUPPLÉANCE TERMINÉE"
+
+    infos = [
+        _info_block("Titulaire", _nom(titulaire)),
+        _info_block("Suppléant", _nom(suppleant)),
+        _info_block("Période", periode),
+        _info_block("Motif", suppleance.motif or "—"),
+        _info_block("Déclarée par", _nom(auteur)),
+    ]
+
+    texte_commun = (
+        f"Titulaire : {_nom(titulaire)}\n"
+        f"Suppléant : {_nom(suppleant)}\n"
+        f"Période : {periode}\n"
+        f"Motif : {suppleance.motif or '—'}\n"
+        f"Déclarée par : {_nom(auteur)}\n"
+    )
+
+    # ── Au suppléant ───────────────────────────────────────────────────────
+    if creation:
+        sujet_s = "[Gestion Missions] Vous êtes désigné suppléant"
+        intro_s = (f"<strong>{_nom(titulaire)}</strong> vous a désigné pour traiter "
+                   f"ses validations de mission pendant son absence.")
+    else:
+        sujet_s = "[Gestion Missions] Fin de votre suppléance"
+        intro_s = (f"Votre suppléance pour <strong>{_nom(titulaire)}</strong> a pris fin. "
+                   f"Ses validations lui reviennent.")
+
+    html_s = _html(
+        titre="Suppléance de signature",
+        couleur_titre=couleur,
+        badge=badge, badge_couleur=couleur,
+        lignes_html=[f"Bonjour <strong>{_nom(suppleant)}</strong>,", intro_s, *infos],
+    )
+    _envoyer(
+        sujet_s,
+        f"Bonjour {_nom(suppleant)},\n\n"
+        + ("Vous avez été désigné suppléant pour les validations de mission.\n\n"
+           if creation else "Votre suppléance a pris fin.\n\n")
+        + texte_commun + "\nCordialement,\nGestion Missions",
+        html_s, _email(suppleant),
+    )
+
+    # ── Au titulaire, s'il n'est pas l'auteur ──────────────────────────────
+    if titulaire.pk != auteur.pk:
+        sujet_t = ("[Gestion Missions] Une suppléance a été ouverte pour vous"
+                   if creation else "[Gestion Missions] Votre suppléance a été clôturée")
+        intro_t = (f"<strong>{_nom(auteur)}</strong> a désigné "
+                   f"<strong>{_nom(suppleant)}</strong> pour traiter vos validations "
+                   f"pendant votre absence." if creation else
+                   f"<strong>{_nom(auteur)}</strong> a mis fin à la suppléance "
+                   f"assurée par <strong>{_nom(suppleant)}</strong>.")
+        html_t = _html(
+            titre="Suppléance de signature",
+            couleur_titre=couleur,
+            badge=badge, badge_couleur=couleur,
+            lignes_html=[f"Bonjour <strong>{_nom(titulaire)}</strong>,", intro_t, *infos],
+        )
+        _envoyer(
+            sujet_t,
+            f"Bonjour {_nom(titulaire)},\n\n{texte_commun}\n"
+            f"Cordialement,\nGestion Missions",
+            html_t, _email(titulaire),
+        )
+
+
 # ── 3. Traitement d'une étape workflow ──────────────────────────────────────
 
 def notifier_traitement_mission(etape, signataire):
@@ -607,6 +689,17 @@ def notifier_traitement_mission(etape, signataire):
     objet = mission.objet_mission
     est_approuve = nouveau_statut == 'APPROUVE'
 
+    # Suppléance : l'action a-t-elle été faite pour le compte d'un autre ?
+    titulaire = etape.user_validation if etape.suppleance_id else None
+    if titulaire is not None and titulaire.pk == signataire.pk:
+        titulaire = None
+    mention_suppleance = (
+        f" pour le compte de <strong>{_nom(titulaire)}</strong>" if titulaire else ""
+    )
+    bloc_suppleance = (
+        [_info_block("Agissant pour", f"{_nom(titulaire)} (suppléance)")] if titulaire else []
+    )
+
     # Confirmation au signataire
     action_label = "approuvé" if est_approuve else "rejeté"
     couleur_action = COLOR_SUCCESS if est_approuve else COLOR_DANGER
@@ -615,7 +708,8 @@ def notifier_traitement_mission(etape, signataire):
     sujet_sig = f"[Gestion Missions] Confirmation de votre action — {numero}"
     texte_sig = (
         f"Bonjour {_nom(signataire)},\n\n"
-        f"Vous avez {action_label} l'étape « {etape.libelle_etape} » pour la mission {numero}.\n"
+        f"Vous avez {action_label} l'étape « {etape.libelle_etape} » pour la mission {numero}"
+        + (f", pour le compte de {_nom(titulaire)}." if titulaire else ".") + "\n"
         f"Date : {etape.date_validation}\n\nCordialement,\nGestion Missions"
     )
     html_sig = _html(
@@ -625,14 +719,45 @@ def notifier_traitement_mission(etape, signataire):
         lignes_html=[
             f"Bonjour <strong>{_nom(signataire)}</strong>,",
             f"Vous avez <strong>{action_label}</strong> l'étape "
-            f"<strong>« {etape.libelle_etape} »</strong> pour la mission suivante.",
+            f"<strong>« {etape.libelle_etape} »</strong>{mention_suppleance} "
+            f"pour la mission suivante.",
             _info_block("Référence", numero),
             _info_block("Objet", objet),
+            *bloc_suppleance,
             _info_block("Date de traitement", str(etape.date_validation)[:16] if etape.date_validation else "—"),
             *([] if est_approuve else [_info_block("Motif", etape.commentaire or "Aucun commentaire")]),
         ],
     )
     _envoyer(sujet_sig, texte_sig, html_sig, _email(signataire))
+
+    # Le titulaire absent doit savoir ce qui a été signé en son nom.
+    if titulaire is not None:
+        sujet_t = f"[Gestion Missions] Étape traitée en votre nom — {numero}"
+        texte_t = (
+            f"Bonjour {_nom(titulaire)},\n\n"
+            f"{_nom(signataire)}, votre suppléant, a {action_label} l'étape "
+            f"« {etape.libelle_etape} » de la mission {numero} en votre nom.\n"
+            f"Date : {etape.date_validation}\n"
+            + (f"Motif : {etape.commentaire or 'Aucun commentaire'}\n" if not est_approuve else "")
+            + "\nCordialement,\nGestion Missions"
+        )
+        html_t = _html(
+            titre=f"Étape traitée en votre nom — {numero}",
+            couleur_titre=couleur_action,
+            badge="TRAITÉ PAR VOTRE SUPPLÉANT", badge_couleur=couleur_action,
+            lignes_html=[
+                f"Bonjour <strong>{_nom(titulaire)}</strong>,",
+                f"<strong>{_nom(signataire)}</strong>, votre suppléant, a "
+                f"<strong>{action_label}</strong> l'étape "
+                f"<strong>« {etape.libelle_etape} »</strong> en votre nom.",
+                _info_block("Référence", numero),
+                _info_block("Objet", objet),
+                _info_block("Traité par", _nom(signataire)),
+                _info_block("Date de traitement", str(etape.date_validation)[:16] if etape.date_validation else "—"),
+                *([] if est_approuve else [_info_block("Motif", etape.commentaire or "Aucun commentaire")]),
+            ],
+        )
+        _envoyer(sujet_t, texte_t, html_t, _email(titulaire))
 
     membres = list(mission.delegations.select_related('employe').all())
 
